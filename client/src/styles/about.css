@@ -1,0 +1,217 @@
+/* about.css */
+
+/* --- Inherit Base Styles & Variables for Consistency --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* --- Re-declaring variables here to make this component self-contained --- */
+:root {
+  /* Light Theme */
+  --primary-color-light: #3B82F6; --primary-hover-light: #2563EB; --primary-glow-light: rgba(59, 130, 246, 0.3);
+  --light-bg-start: #f4f7f9; --light-bg-end: #e6e9ee; --light-text: #334155; --light-heading: #1e293b;
+  --light-card-bg: rgba(255, 255, 255, 0.75); --light-card-border: #e2e8f0; --light-shadow: rgba(45, 55, 72, 0.1);
+
+  /* Dark Theme */
+  --primary-color-dark: #60A5FA; --primary-hover-dark: #3B82F6; --primary-glow-dark: rgba(96, 165, 250, 0.25);
+  --dark-bg-start: #0f172a; --dark-bg-end: #1e293b; --dark-text: #94a3b8; --dark-heading: #e2e8f0;
+  --dark-card-bg: rgba(30, 41, 59, 0.75); --dark-card-border: #334155; --dark-shadow: rgba(0, 0, 0, 0.2);
+}
+
+/* --- Theme Application --- */
+.about-us-container.light {
+  --primary-color: var(--primary-color-light); --primary-hover: var(--primary-hover-light); --glow-color: var(--primary-glow-light);
+  --bg-gradient: linear-gradient(135deg, var(--light-bg-start), var(--light-bg-end));
+  --text-color: var(--light-text); --heading-color: var(--light-heading); --card-bg: var(--light-card-bg);
+  --card-border: var(--light-card-border); --shadow-color: var(--light-shadow);
+}
+
+.about-us-container.dark {
+  --primary-color: var(--primary-color-dark); --primary-hover: var(--primary-hover-dark); --glow-color: var(--primary-glow-dark);
+  --bg-gradient: linear-gradient(135deg, var(--dark-bg-start), var(--dark-bg-end));
+  --text-color: var(--dark-text); --heading-color: var(--dark-heading); --card-bg: var(--dark-card-bg);
+  --card-border: var(--dark-card-border); --shadow-color: var(--dark-shadow);
+}
+
+/* --- Global Styles & Animated Background --- */
+@keyframes gradient-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.about-us-container {
+  display: flex; flex-direction: column; min-height: 100vh;
+  font-family: 'Poppins', sans-serif; color: var(--text-color);
+  background: var(--bg-gradient); background-size: 200% 200%;
+  animation: gradient-pan 20s ease infinite; transition: all 0.4s ease;
+}
+
+/* --- Header --- */
+.about-header {
+  position: sticky; top: 0; z-index: 1000;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 5%; background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px); border-bottom: 1px solid var(--card-border);
+}
+.back-home-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  color: var(--primary-color); text-decoration: none; font-weight: 600;
+  padding: 0.5rem 1rem; border-radius: 50px; transition: background-color 0.3s ease;
+}
+.back-home-btn:hover { background-color: var(--primary-color-light); color: white; }
+.dark .back-home-btn:hover { background-color: var(--primary-color-dark); color: var(--dark-bg-start); }
+.theme-toggle-btn { /* Style reused from intro.css */ background: transparent; border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; color: #6c757d; font-size: 1.4rem; border: none; transition: all 0.3s ease; }
+.theme-toggle-btn:hover { color: var(--primary-color); transform: scale(1.1) rotate(15deg); }
+
+
+/* --- Main Content --- */
+.about-main {
+  width: 100%; max-width: 1100px;
+  margin: 0 auto; padding: 2rem;
+}
+
+/* --- Hero Section --- */
+.about-hero {
+  text-align: center; margin: 4rem 0 6rem;
+}
+.about-hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700;
+  color: var(--heading-color); margin-bottom: 1rem;
+}
+.about-hero h1 span {
+  background: linear-gradient(45deg, var(--primary-color), var(--primary-hover));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.about-hero .hero-subtitle {
+  font-size: 1.15rem; max-width: 700px; margin: 0 auto;
+  line-height: 1.7; color: var(--text-color);
+}
+
+/* --- Scroll Animation & Section Styling --- */
+.about-section {
+  padding: 3rem; background-color: var(--card-bg);
+  border-radius: 24px; border: 1px solid var(--card-border);
+  box-shadow: 0 10px 40px -10px var(--shadow-color);
+  margin-bottom: 4rem;
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.about-section.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* --- Mission Section --- */
+.mission-section {
+  display: flex; align-items: center; gap: 3rem;
+}
+.mission-icon {
+  flex-shrink: 0; font-size: 4rem; color: var(--primary-color);
+  padding: 2rem; background: var(--glow-color); border-radius: 50%;
+}
+.mission-text h2 {
+  font-size: 2.2rem; margin: 0 0 1rem; color: var(--heading-color);
+}
+.mission-text p {
+  line-height: 1.8; font-size: 1.05rem;
+}
+
+/* --- Features Overview Section --- */
+.features-overview h2 {
+  text-align: center; font-size: 2.2rem;
+  color: var(--heading-color); margin-bottom: 2.5rem;
+}
+.features-grid-about {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.feature-item-card {
+  display: flex; align-items: center; gap: 1rem;
+  background-color: var(--bg-gradient);
+  padding: 1.25rem; border-radius: 12px;
+  font-weight: 600; color: var(--heading-color);
+  border: 1px solid var(--card-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-item-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px -5px var(--glow-color);
+}
+.feature-item-icon {
+  font-size: 1.8rem; color: var(--primary-color);
+}
+/* Staggered animation for feature cards */
+.features-overview.visible .feature-item-card {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Add delays for a beautiful staggered effect */
+.features-overview.visible .feature-item-card:nth-child(2) { animation-delay: 0.1s; }
+.features-overview.visible .feature-item-card:nth-child(3) { animation-delay: 0.2s; }
+.features-overview.visible .feature-item-card:nth-child(4) { animation-delay: 0.3s; }
+.features-overview.visible .feature-item-card:nth-child(5) { animation-delay: 0.4s; }
+.features-overview.visible .feature-item-card:nth-child(6) { animation-delay: 0.5s; }
+
+/* --- Creator Section --- */
+.creator-section h2 {
+  text-align: center; font-size: 2.2rem; color: var(--heading-color); margin-bottom: 2.5rem;
+}
+.creator-section h2 span { /* Same gradient as hero */ background: linear-gradient(45deg, var(--primary-color), var(--primary-hover)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+.creator-card {
+  display: flex; align-items: center; gap: 3rem;
+  padding: 2.5rem; background-color: var(--card-bg);
+  border-radius: 20px;
+}
+.creator-photo-wrapper {
+  flex-shrink: 0;
+  position: relative;
+}
+.creator-photo {
+  width: 150px; height: 150px; object-fit: cover;
+  border-radius: 50%; border: 4px solid var(--primary-color);
+  box-shadow: 0 0 25px var(--glow-color);
+}
+.creator-info h3 {
+  font-size: 1.8rem; font-weight: 700;
+  margin: 0 0 0.5rem; color: var(--heading-color);
+}
+.creator-bio {
+  line-height: 1.7; margin-bottom: 1.5rem;
+}
+.creator-bio strong {
+  color: var(--heading-color); font-weight: 600;
+}
+.creator-socials {
+  display: flex; gap: 1rem;
+}
+.creator-socials a {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  background-color: rgba(148, 163, 184, 0.1);
+  color: var(--text-color); border-radius: 50%;
+  font-size: 1.4rem; transition: all 0.3s ease;
+}
+.creator-socials a:hover {
+  background-color: var(--primary-color); color: white;
+  transform: translateY(-3px) scale(1.1);
+}
+
+/* --- Footer --- */
+.about-footer {
+  text-align: center; padding: 2rem;
+  background-color: var(--dark-bg-start);
+  color: var(--text-color); font-size: 0.9rem;
+  border-top: 1px solid var(--card-border);
+  margin-top: 2rem;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+  .about-header { padding: 1rem 3%; }
+  .mission-section, .creator-card {
+    flex-direction: column; text-align: center; gap: 2rem;
+  }
+  .creator-card { padding: 2rem; }
+  .creator-socials { justify-content: center; }
+}

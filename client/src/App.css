@@ -1,0 +1,247 @@
+/* --- THEME VARIABLES --- */
+:root, [data-theme='light'] {
+  --bg-primary: #f4f7fa;          /* Main background color of the page */
+  --bg-secondary: #ffffff;        /* Background of cards, modals, etc. */
+  --text-primary: #1e293b;        /* Main text color */
+  --text-secondary: #64748b;      /* Lighter text for subheadings */
+  --sidebar-bg: #1e293b;          /* Sidebar background color */
+  --sidebar-text: #cbd5e1;        /* Sidebar link text color */
+  --sidebar-text-active: #ffffff; /* Active sidebar link text color */
+  --sidebar-bg-active: #334155;  /* Active sidebar link background */
+  --header-bg: #ffffff;           /* Header background color */
+  --border-color: #e2e8f0;        /* Border color for elements */
+  --shadow-color: rgba(0, 0, 0, 0.1); /* Shadow for cards and header */
+  --toggle-bg: #334155;          /* Theme toggle button background */
+  --toggle-fg: #f1c40f;          /* Sun icon color */
+  --scrollbar-track: var(--sidebar-bg);
+  --scrollbar-thumb: var(--sidebar-bg-active);
+}
+
+[data-theme='dark'] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #94a3b8;
+  --sidebar-text-active: #ffffff;
+  --sidebar-bg-active: #334155;
+  --header-bg: #1e293b;
+  --border-color: #334155;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --toggle-bg: #e2e8f0;
+  --toggle-fg: #f39c12;
+  --scrollbar-track: var(--sidebar-bg);
+  --scrollbar-thumb: var(--sidebar-bg-active);
+}
+
+/* --- GLOBAL & LAYOUT STYLES --- */
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.dashboard-layout {
+  display: flex;
+}
+
+.sidebar-container {
+  width: 260px;
+  flex-shrink: 0; /* Prevents sidebar from shrinking */
+}
+
+.main-content {
+  flex-grow: 1;
+  padding-left: 260px; /* Same as sidebar width, to make space for it */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header-container {
+  width: calc(100% - 260px); /* Full width minus sidebar width */
+  position: fixed;
+  top: 0;
+  left: 260px; /* Position it next to the sidebar */
+  z-index: 100;
+}
+
+.page-content {
+  margin-top: 80px; /* Same as header height */
+  padding: 2rem;
+}
+
+/* --- SIDEBAR STYLES (WITH SCROLL FIX) --- */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  /* overflow-y has been removed from here */
+}
+
+.sidebar-header {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+/* THIS IS THE FIX: The menu list is now the scrollable part */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; /* Pushes the logout button to the bottom by taking all available space */
+  overflow-y: auto; /* Makes only the menu scrollable */
+  
+  /* Optional: Better looking scrollbars for Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Optional: Better looking scrollbars for Chrome/Safari/Edge */
+.sidebar-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 10px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+.menu-heading {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+}
+
+.menu-item a, .logout-button {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+  font-size: 0.95rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item a:hover, .logout-button:hover {
+  background-color: var(--sidebar-bg-active);
+  color: var(--sidebar-text-active);
+}
+
+/* Style for the active NavLink */
+.menu-item a.active {
+  background-color: var(--sidebar-bg-active);
+  color: var(--sidebar-text-active);
+  font-weight: 600;
+}
+
+
+/* --- HEADER STYLES --- */
+.header {
+  height: 80px;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.header-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.header-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* --- THEME TOGGLE BUTTON --- */
+.theme-toggle-button {
+  background: var(--toggle-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.5rem;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 0.5rem;
+  position: relative;
+  width: 5rem;
+  height: 2.5rem;
+}
+
+.theme-toggle-button svg {
+  height: auto;
+  width: 1.5rem;
+  transition: all 0.3s linear;
+}
+
+.theme-toggle-button .sun {
+  transform: translateY(0);
+}
+
+.theme-toggle-button .moon {
+  transform: translateY(-100px); /* Hide by default */
+}
+
+/* When theme is dark, hide sun and show moon */
+.theme-toggle-button.dark .sun {
+    transform: translateY(100px);
+}
+
+.theme-toggle-button.dark .moon {
+    transform: translateY(0);
+}
+
+/* --- PAGE STYLES --- */
+.page-container {
+  background-color: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.page-container h1 {
+  margin-top: 0;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}

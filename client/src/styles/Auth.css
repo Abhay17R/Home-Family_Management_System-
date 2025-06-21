@@ -1,0 +1,503 @@
+/* src/styles/Auth.css - The Unified & Final CSS */
+
+/* --- Page & Container --- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #0f172a; /* Dark Navy Blue Background */
+  font-family: 'Poppins', sans-serif;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem;
+  background-color: #1e293b; /* Lighter Navy Blue Card */
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+/* --- Toggle Switch --- */
+.auth-toggle {
+  display: flex;
+  background-color: #0f172a;
+  border-radius: 50px;
+  padding: 5px;
+  margin-bottom: 2.5rem;
+}
+
+.toggle-btn {
+  width: 50%;
+  padding: 0.8rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #94a3b8; /* Dimmed color */
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.toggle-btn.active {
+  background: #3b82f6; /* Bright blue */
+  color: #fff;
+  box-shadow: 0 4px 15px -5px #3b82f6;
+}
+
+/* --- Common Form Styling (for both Login & Register) --- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.auth-form h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #e2e8f0; /* White-ish heading */
+  margin: 0 0 1rem 0;
+}
+
+.auth-form input, .auth-form select {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #e2e8f0;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.auth-form input::placeholder {
+  color: #94a3b8;
+}
+
+.auth-form input:focus, .auth-form select:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+}
+
+.phone-input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+.phone-input-group select { flex: 0 0 100px; }
+.phone-input-group input { flex-grow: 1; }
+
+.error-message {
+  color: #f87171;
+  font-size: 0.85rem;
+  text-align: left;
+  margin-top: -0px; /* Pull it closer to the input */
+  padding-left: 0.25rem;
+}
+
+.auth-form button[type="submit"] {
+  padding: 1rem;
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-form button[type="submit"]:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.bottom-links {
+  text-align: center;
+  margin-top: 1rem;
+}
+.bottom-links p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #94a3b8;
+}
+
+.bottom-links .link-style, .bottom-links a {
+  color: #60a5fa;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.bottom-links .link-style:hover, .bottom-links a:hover {
+  text-decoration: underline;
+}
+
+/* Custom Radio Buttons from Register.css */
+.verification-method {
+  text-align: left; margin: 0;
+}
+.verification-method p {
+  font-weight: 600; color: #e2e8f0; margin-bottom: 0.75rem; font-size: 0.95rem;
+}
+.verification-method .wrapper {
+  display: flex; gap: 2rem;
+}
+.verification-method label {
+  display: flex; align-items: center; cursor: pointer; gap: 0.75rem; color: #cbd5e1; font-size: 1rem;
+}
+.verification-method input[type="radio"] {
+  display: none;
+}
+.verification-method label::before {
+  content: ''; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #334155; background-color: #0f172a; transition: all 0.2s ease;
+}
+.verification-method input[type="radio"]:checked + label::before {
+  border-color: #60a5fa; background-color: #60a5fa; box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+}
+/* Isse apni styles/Auth.css file mein add karein */
+
+.form-description {
+  color: #94a3b8; /* Standard text color */
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+/* Isse Auth.css file mein add karein */
+
+.phone-input-group .country-code {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-right: none; /* right border hata dein to input se jud jaye */
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.phone-input-group input[type="number"] {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+/* Isse apni styles/Auth.css file mein add karein */
+
+/* --- OTP Input Specific Styling --- */
+.otp-input-fields {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.otp-input {
+  width: 55px !important;  /* Overwrite width */
+  height: 55px;
+  font-size: 1.8rem !important; /* Overwrite font-size */
+  text-align: center;
+  /* Baaki saari styling (border, background, color) .auth-form input se aa jayegi */
+}
+
+/* Hide number input arrows on Chrome, Safari, Edge, Opera */
+.otp-input::-webkit-outer-spin-button,
+.otp-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input arrows on Firefox */
+/* .otp-input[type=number] {
+  -moz-appearance: textfield;
+} */
+ /* src/styles/Auth.css - MORE COMPACT VERSION */
+
+/* --- Page & Container --- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem; /* Thoda kam padding */
+  background-color: #0f172a;
+  font-family: 'Poppins', sans-serif;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 380px;
+  /* ✅ PADDING KAM KI GAYI HAI */
+  padding: 2rem 2.2rem; 
+  background-color: #1e293b;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+/* --- Toggle Switch --- */
+.auth-toggle {
+  display: flex;
+  background-color: #0f172a;
+  border-radius: 50px;
+  padding: 5px;
+  /* ✅ MARGIN KAM KI GAYI HAI */
+  margin-bottom: 2rem; 
+}
+
+.toggle-btn {
+  width: 50%;
+  padding: 0.7rem 0; /* Thoda kam padding */
+  font-size: 0.95rem; /* Thoda chhota font */
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.toggle-btn.active {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 4px 15px -5px #3b82f6;
+}
+
+/* --- Common Form Styling --- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  /* ✅ SABSE ZAROORI BADLAAV: GAP KAM KIYA GAYA HAI */
+  gap: 0.9rem; 
+}
+
+.auth-form h2 {
+  text-align: center;
+  /* ✅ FONT SIZE AUR MARGIN KAM KI GAYI HAI */
+  font-size: 2rem; 
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 0.8rem; 
+}
+
+.auth-form input, .auth-form select {
+  width: 100%;
+  /* ✅ INPUT PADDING KAM KI GAYI HAI */
+  padding: 0.9rem; 
+  font-size: 1rem;
+  color: #e2e8f0;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px; /* Thoda kam rounded */
+  transition: all 0.3s ease;
+}
+
+.auth-form input::placeholder { color: #94a3b8; }
+
+.auth-form input:focus, .auth-form select:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15); /* Glow thoda kam */
+}
+
+.phone-input-group { display: flex; gap: 0.75rem; }
+.phone-input-group select { flex: 0 0 100px; }
+.phone-input-group input { flex-grow: 1; }
+
+
+
+.auth-form button[type="submit"] {
+  padding: 0.9rem; /* Button padding kam */
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-form button[type="submit"]:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.bottom-links {
+  text-align: center;
+  margin-top: 0.8rem;
+}
+.bottom-links p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+.bottom-links .link-style, .bottom-links a {
+  color: #60a5fa;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.bottom-links .link-style:hover, .bottom-links a:hover { text-decoration: underline; }
+
+/* Custom Radio Buttons */
+.verification-method { text-align: left; margin: 0; }
+.verification-method p {
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 0.6rem; /* Margin kam */
+  font-size: 0.9rem;
+}
+.verification-method .wrapper { display: flex; gap: 1.5rem; }
+.verification-method label {
+  display: flex; align-items: center; cursor: pointer; gap: 0.6rem; color: #cbd5e1; font-size: 0.95rem;
+}
+.verification-method input[type="radio"] { display: none; }
+.verification-method label::before {
+  content: ''; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #334155; background-color: #0f172a; transition: all 0.2s ease;
+}
+.verification-method input[type="radio"]:checked + label::before {
+  border-color: #60a5fa; background-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+}
+.auth-page-wrapper.light {
+  --primary-color: #3B82F6;
+  --primary-hover: #2563EB;
+  --glow-color: rgba(59, 130, 246, 0.3);
+  --bg-gradient: linear-gradient(135deg, #f4f7f9, #e6e9ee);
+  --text-color: #334155;
+  --heading-color: #1e293b;
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-border: #e2e8f0;
+  --shadow-color: rgba(45, 55, 72, 0.1);
+  --footer-bg: #e9ecef;
+}
+
+.auth-page-wrapper.dark {
+  --primary-color: #60A5FA;
+  --primary-hover: #3B82F6;
+  --glow-color: rgba(96, 165, 250, 0.25);
+  --bg-gradient: linear-gradient(135deg, #0f172a, #1e293b);
+  --text-color: #94a3b8;
+  --heading-color: #e2e8f0;
+  --card-bg: rgba(30, 41, 59, 0.65);
+  --card-border: #334155;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --footer-bg: #0f172a;
+}
+
+.auth-page-wrapper {
+  background: var(--bg-gradient);
+  background-size: 200% 200%;
+  animation: gradient-pan 20s ease infinite;
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+/* Reuse Navbar styles */
+.home-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background-color: var(--card-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.home-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-3px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.theme-toggle-btn {
+  background: transparent;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.4rem;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--primary-color);
+  transform: scale(1.1) rotate(15deg);
+}
+
+/* Reuse animated bg */
+@keyframes gradient-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.home-link {
+  color: skyblue;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}

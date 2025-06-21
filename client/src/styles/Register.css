@@ -1,0 +1,166 @@
+/* src/styles/Register.css */
+
+/* --- Page Background --- */
+.register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #0f172a; /* Dark Navy Blue Background */
+  font-family: 'Poppins', sans-serif;
+}
+
+/* --- Register Card --- */
+.register-container {
+  width: 100%;
+  max-width: 480px; /* Thoda sa bada for more fields */
+  padding: 2.5rem;
+  background-color: #1e293b; /* Lighter Navy Blue Card */
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.register-container h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #60a5fa; /* Bright Blue Heading */
+  margin: 0 0 2rem 0;
+}
+
+/* --- Form --- */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem; /* Thoda kam gap for more fields */
+}
+
+.register-form .input-group, .register-form .phone-input-group {
+  width: 100%;
+}
+
+.register-form input, .register-form select {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #e2e8f0; /* Light text color */
+  background-color: #0f172a; /* Dark input background */
+  border: 1px solid #334155; /* Subtle border */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.register-form input::placeholder {
+  color: #94a3b8; /* Placeholder text */
+}
+
+.register-form input:focus, .register-form select:focus {
+  outline: none;
+  border-color: #60a5fa; /* Blue border on focus */
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2); /* Blue glow */
+}
+
+/* --- Phone Input Specifics --- */
+.phone-input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+.phone-input-group select {
+  flex: 0 0 100px; /* Fixed width for country code */
+}
+.phone-input-group input {
+  flex-grow: 1;
+}
+
+/* --- Custom Radio Buttons --- */
+.verification-method {
+  text-align: left;
+  margin: 0.5rem 0;
+}
+.verification-method p {
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+.verification-method .wrapper {
+  display: flex;
+  gap: 2rem;
+}
+.verification-method label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.75rem;
+  color: #cbd5e1;
+  font-size: 1rem;
+}
+.verification-method input[type="radio"] {
+  display: none;
+}
+.verification-method label::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #334155;
+  background-color: #0f172a;
+  transition: all 0.2s ease;
+}
+.verification-method input[type="radio"]:checked + label::before {
+  border-color: #60a5fa;
+  background-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+}
+
+/* --- Error Message Styling --- */
+.error-message {
+  color: #f87171; /* A softer red */
+  font-size: 0.85rem;
+  text-align: left;
+  margin-top: 5px;
+  padding-left: 0.25rem;
+}
+.phone-input-group + .error-message {
+  margin-top: -1rem; /* Adjust for phone group */
+  margin-bottom: 0.5rem;
+}
+
+/* --- Submit Button --- */
+.btn-register-submit {
+  padding: 1rem;
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #3b82f6; /* Primary Blue Button */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-register-submit:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+/* --- Bottom Links --- */
+.bottom-links {
+  text-align: center;
+  margin-top: 1rem;
+}
+.bottom-links p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #94a3b8;
+}
+.bottom-links a {
+  color: #60a5fa;
+  font-weight: 600;
+  text-decoration: none;
+}
+.bottom-links a:hover {
+  text-decoration: underline;
+}

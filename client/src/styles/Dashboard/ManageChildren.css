@@ -1,0 +1,182 @@
+/* --- Manage Children Page Styles --- */
+.manage-children-container {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap; /* Chhoti screens ke liye */
+    gap: 1rem;
+}
+
+.page-header h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-header p {
+    font-size: 1rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+.add-child-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #2A3F54;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.add-child-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* Responsive Grid for Child Cards */
+.children-grid {
+    display: grid;
+    /* Yeh line grid ko apne aap responsive banati hai */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Single Child Card Styling */
+.child-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
+    overflow: hidden; /* Taaki border radius kaam kare */
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.child-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    gap: 1rem;
+}
+
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.child-name {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #343a40;
+}
+
+.child-username {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.card-body {
+    padding: 1.5rem;
+    flex-grow: 1; /* Taaki card ki height barabar rahe */
+}
+
+.card-body h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    color: #495057;
+    font-weight: 600;
+}
+
+/* Permissions (AddChild se reuse ki gayi) */
+.permission-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.permission-item:last-child {
+    margin-bottom: 0;
+}
+
+.permission-item span {
+    font-size: 0.95rem;
+    color: #495057;
+}
+
+/* Toggle Switch CSS (AddChild se reuse ki gayi) */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #2A3F54; }
+input:checked + .slider:before { transform: translateX(20px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    border-top: 1px solid #e9ecef;
+}
+
+.card-actions button {
+    flex: 1; /* Dono buttons barabar jagah lein */
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-edit {
+    color: #495057;
+}
+.btn-edit:hover {
+    background-color: #f1f3f5;
+}
+
+.btn-remove {
+    color: #e63946; /* Red color for remove */
+    border-left: 1px solid #e9ecef;
+}
+.btn-remove:hover {
+    background-color: #fcebeb;
+}
+
+/* Jab koi child na ho */
+.no-children-found {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    color: #6c757d;
+}

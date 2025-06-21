@@ -1,0 +1,41 @@
+/* --- Dashboard Layout CSS --- */
+
+/* Main wrapper jise main content area ko push karne ke liye istemal kiya jayega */
+.main-content-wrapper {
+  /* SABSE ZAROORI: 
+     Sidebar ki width 250px hai, isliye hum main content ko 250px left se shuru kar rahe hain. 
+     Isse sidebar ke liye jagah ban jaati hai. */
+  margin-left: 250px; 
+  width: calc(100% - 250px); /* Bachi hui poori width le lo */
+  height: 100vh; /* Poori screen ki height */
+  
+  /* Iske andar Header aur Outlet ko vertically arrange karne ke liye */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page content (Outlet) ke liye container */
+.page-outlet {
+  flex-grow: 1; /* Header ke baad bachi hui saari vertical jagah le lo */
+  overflow-y: auto; /* Agar content zyada ho toh sirf yeh area scroll ho, poora page nahi */
+  background-color: #f7f9fc; /* Aapke screenshot jaisa halka background */
+}
+
+/* Aapka AddChild component ab iske andar aayega, 
+   usko poori width milegi. */
+/* Aapko .add-child-container se padding hata deni chahiye 
+   aur page-outlet mein de deni chahiye taaki har page par consistent spacing rahe */
+.page-outlet > * {
+   padding: 2rem 2.5rem;
+}
+
+
+/* --- Responsive Design --- */
+/* Jab screen chhoti ho, aapka sidebar 80px ka ho jaata hai */
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    /* Margin ko sidebar ki collapsed width (80px) se match karein */
+    margin-left: 80px;
+    width: calc(100% - 80px);
+  }
+}

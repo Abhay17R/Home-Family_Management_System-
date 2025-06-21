@@ -1,0 +1,110 @@
+/* --- OTP Child Page Styles (5-Box Version) --- */
+
+/* General page layout - Bilkul sahi hai, koi badlav nahi */
+.otp-child-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 4rem;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+.otp-card {
+    background-color: #ffffff;
+    padding: 2.5rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.07);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.otp-header h2,
+.otp-header p,
+.email-display,
+.otp-form label {
+    /* Inmein koi badlav ki zaroorat nahi, yeh perfect hain */
+    color: #333; /* Example */
+}
+.otp-header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.otp-header p { color: #6c757d; margin-bottom: 0.5rem; }
+.email-display { color: #2A3F54; font-weight: 600; display: block; margin-bottom: 2rem; }
+.otp-form label { display: block; margin-bottom: 1rem; font-weight: 600; color: #495057; }
+
+
+/* --- ✅ YAHAN SE BADLAV SHURU HAIN --- */
+
+/* 1. Naya container 5 dibbon ko line mein rakhne ke liye */
+.otp-input-fields {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Dibbon ke beech mein space */
+    margin-bottom: 1.5rem;
+}
+
+/* 2. Har ek OTP dibbe ki styling */
+.otp-input {
+    width: 50px;  /* Har dibbe ki chaundai (width) */
+    height: 55px; /* Har dibbe ki unchai (height) */
+    font-size: 1.75rem; /* Andar ke text ka size */
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-weight: 600;
+    
+    /* Purani (single-box) styling hata di gayi hai */
+    /* letter-spacing, background-image, etc. hata diye gaye */
+}
+
+.otp-input:focus {
+    outline: none;
+    border-color: #2A3F54;
+    box-shadow: 0 0 0 3px rgba(42, 63, 84, 0.15);
+}
+
+/* --- Baaki ka CSS bilkul sahi hai --- */
+
+.error-message {
+    color: #e63946;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.btn-verify {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #2A3F54;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.btn-verify:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-verify:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+}
+
+.resend-otp {
+    margin-top: 1.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.resend-link {
+    background: none;
+    border: none;
+    color: #2A3F54;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
