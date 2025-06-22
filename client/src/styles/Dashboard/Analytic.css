@@ -193,3 +193,106 @@
         gap: 8px;
     }
 }
+/* ... Aapki purani CSS ... */
+
+/* --- NAYE STYLES --- */
+
+/* Stats Grid me 5 column ke liye */
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* Online Card ka specific pulse effect */
+.online-card .stat-icon-wrapper {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Main Content Area (Online List aur Activity Table ke liye) */
+.main-content-area {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Online list choti, activity badi */
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.online-list-card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+}
+
+.online-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.online-list-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.online-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #22c55e; /* Green */
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.online-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.online-member {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.online-member .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.online-member .member-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  flex-grow: 1; /* Taaki naam ke baad space le le */
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.status-dot.online {
+  background-color: #22c55e; /* Green */
+}
+.status-dot.away {
+  background-color: #f59e0b; /* Amber */
+}
+.status-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive ke liye */
+@media (max-width: 992px) {
+  .main-content-area {
+    grid-template-columns: 1fr;
+  }
+}

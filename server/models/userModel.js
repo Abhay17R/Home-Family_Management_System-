@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
     maxLength: [32, "Password can't exceed 32 characters"],
     select: false,
   },
+  permissions: {
+    locationTracking: { type: Boolean, default: true },
+    emergencyAlerts: { type: Boolean, default: true },
+},
   phone: String,
   accountVerified: { type: Boolean, default: false },
   verificationCode: Number,
@@ -43,6 +47,7 @@ const userSchema = new mongoose.Schema({
       return this.role === "admin" ? crypto.randomBytes(8).toString("hex") : null;
     },
   },
+  
 }, {
   timestamps: true
 });

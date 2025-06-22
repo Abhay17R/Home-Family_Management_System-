@@ -1,45 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+// import React, { useState } from 'react';
 import '../../styles/Dashboard/ManageChildren.css'; // Is CSS file ko hum abhi banayenge
 
 // --- DUMMY DATA ---
 // Jab aap backend se connect karenge, toh yeh data API se aayega.
-const initialChildrenData = [
-    {
-        id: 1,
-        firstName: 'Rohan',
-        lastName: 'Sharma',
-        username: 'rohan.sharma',
-        profilePic: 'https://i.pravatar.cc/150?img=12', // Random user image
-        permissions: {
-            locationTracking: true,
-            emergencyAlerts: true,
-        },
-    },
-    {
-        id: 2,
-        firstName: 'Priya',
-        lastName: 'Verma',
-        username: 'priya.verma',
-        profilePic: 'https://i.pravatar.cc/150?img=25',
-        permissions: {
-            locationTracking: true,
-            emergencyAlerts: false,
-        },
-    },
-    {
-        id: 3,
-        firstName: 'Aarav',
-        lastName: 'Patel',
-        username: 'aarav.p',
-        profilePic: 'https://i.pravatar.cc/150?img=32',
-        permissions: {
-            locationTracking: false,
-            emergencyAlerts: true,
-        },
-    },
-];
-
+const initialChildrenData = [];
+   
 // Chhote SVG Icons
 const AddIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
 const EditIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>;
@@ -47,20 +15,74 @@ const RemoveIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" heig
 
 
 const ManageChildren = () => {
-    const [children, setChildren] = useState(initialChildrenData);
+    const [children, setChildren] = useState([]);
+    const [loading,setLoading]=useState(true);
+    const [error,setError]=useState('');
 
-    const handleRemoveChild = (childId) => {
+    useEffect(()=>{
+        const fetchChildren =async()=>{
+            try {
+                const {data}=await axios.get('http://localhost:4000/api/v1/admin/my-children',
+                    {withCredentials:true}
+                );
+                if(data.success) setChildren(data.children);
+            
+                
+            } catch (err) {
+                setError('Failed to load child profiles.');
+                console.error(err);    
+            }finally{
+                setLoading(false);
+            }
+        };
+        fetchChildren();
+    },[]);
+
+    const handleRemoveChild =async (childId) => {
         // Confirmation dialog
         if (window.confirm('Are you sure you want to remove this profile? This action cannot be undone.')) {
-            setChildren(prevChildren => prevChildren.filter(child => child.id !== childId));
-            // Yahan aap backend par API call bhejenge to delete the profile
-            console.log(`Removing child with ID: ${childId}`);
+            try {
+                await axios.delete(`http://localhost:4000/api/v1/admin/child/${childId}`,{
+                    withCredentials:true
+                });
+                setChildren(prevChildren=>prevChildren.filter(child=>child._id!==childId));
+
+
+            } catch (error) {
+                alert('Error:Could not remove the profile.');
+            }
         }
     };
+    const handlePermissionChange=async(childId,field,value)=>{
+        try {
+            await axios.put(`http://localhost:4000/api/v1/admin/child/${childId}`,
+            { permissions:{[field]:value}},
+            {withCredentials:true});
 
+            setChildren(prev=>prev.map(child=>child._id===childId?
+                {...child,permissions:{...child.permissions,[field]:value}}
+                :child
+            ));
+
+        } catch (error) {
+            alert('Failed to update permission.');
+            
+        }
+    }
+
+
+
+    if (loading) {
+        return <div className="loading-message">Loading profiles, please wait...</div>;
+    }
+
+    if (error) {
+        return <div className="error-message">{error}</div>;
+    }
+
+  
     return (
         <div className="manage-children-container">
-            {/* Page Header */}
             <div className="page-header">
                 <div>
                     <h2>Manage Child Profiles</h2>
@@ -72,15 +94,17 @@ const ManageChildren = () => {
                 </Link>
             </div>
 
-            {/* Children Grid */}
             <div className="children-grid">
                 {children.map((child) => (
-                    <div className="child-card" key={child.id}>
+                    // ✅ FIX: key ko child._id kiya
+                    <div className="child-card" key={child._id}>
                         <div className="card-header">
-                            <img src={child.profilePic} alt={`${child.firstName}'s profile`} className="profile-pic" />
+                            {/* ✅ FIX: Profile pic ke liye fallback use kiya */}
+                            <img src={child.profilePic?.url || `https://api.dicebear.com/8.x/initials/svg?seed=${child.name}`} alt={`${child.name}'s profile`} className="profile-pic" />
                             <div className="name-details">
-                                <h3 className="child-name">{child.firstName} {child.lastName}</h3>
-                                <span className="child-username">@{child.username}</span>
+                                {/* ✅ FIX: 'name' field use kiya */}
+                                <h3 className="child-name">{child.name}</h3>
+                                <span className="child-username">@{child.email.split('@')[0]}</span>
                             </div>
                         </div>
 
@@ -89,14 +113,24 @@ const ManageChildren = () => {
                             <div className="permission-item">
                                 <span>Location Tracking</span>
                                 <label className="switch">
-                                    <input type="checkbox" defaultChecked={child.permissions.locationTracking} />
+                                    {/* ✅ FIX: `checked` use kiya, optional chaining lagayi aur onChange event joda */}
+                                    <input
+                                        type="checkbox"
+                                        checked={child.permissions?.locationTracking || false}
+                                        onChange={(e) => handlePermissionChange(child._id, 'locationTracking', e.target.checked)}
+                                    />
                                     <span className="slider round"></span>
                                 </label>
                             </div>
                             <div className="permission-item">
                                 <span>Emergency Alerts</span>
                                 <label className="switch">
-                                    <input type="checkbox" defaultChecked={child.permissions.emergencyAlerts} />
+                                    {/* ✅ FIX: `checked` use kiya, optional chaining lagayi aur onChange event joda */}
+                                    <input
+                                        type="checkbox"
+                                        checked={child.permissions?.emergencyAlerts || false}
+                                        onChange={(e) => handlePermissionChange(child._id, 'emergencyAlerts', e.target.checked)}
+                                    />
                                     <span className="slider round"></span>
                                 </label>
                             </div>
@@ -107,7 +141,8 @@ const ManageChildren = () => {
                                 <EditIcon />
                                 <span>Edit</span>
                             </button>
-                            <button className="btn-remove" onClick={() => handleRemoveChild(child.id)}>
+                            {/* ✅ FIX: child._id pass kiya */}
+                            <button className="btn-remove" onClick={() => handleRemoveChild(child._id)}>
                                 <RemoveIcon />
                                 <span>Remove</span>
                             </button>
@@ -115,7 +150,8 @@ const ManageChildren = () => {
                     </div>
                 ))}
             </div>
-            {children.length === 0 && (
+            
+            {children.length === 0 && !loading && (
                 <div className="no-children-found">
                     <h3>No child profiles found.</h3>
                     <p>Click on "Add New Child" to create a new profile.</p>

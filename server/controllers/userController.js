@@ -469,4 +469,86 @@ export const resetPassword=catchAsyncError(async(req,res,next)=>{
 
   sendToken(user,200,"Rest password successfully",res);
 
-})
+});
+
+export const getAllMyChildren= (async(req,res,next)=>{
+  
+    try {
+      const children=await User.find({
+      role:'child',
+      parentId:req.user.id,
+       accountVerified: true 
+    }).select('-password');
+
+    res.status(200).json({
+      success:true,
+      count:children.length,children,
+    });
+      
+    } catch (error) {
+      res.status(500).json({success:false,message:'server error'})
+      
+    }
+ });
+
+ export const updateChildProfile=async(req,res,next)=>{
+  try {
+    
+     const child=await User.findById(req.params.id);
+    if(!child||child.parentId.toString()!==req.user.id){
+      return res.status(403).json({success:false,message:'Profile not found or not authorized'});
+    }
+
+
+    const updatedChild =await User.findByIdAndUpdate(req.params.id,req.body,{
+      new:true,
+      runValidators:true,
+
+    }).select('-password');
+    res.status(200).json({
+      success:true,
+      message:'Profile updated successfully',
+      child:updatedChild,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      message:'Server Error'
+    });
+    
+  }
+ };
+
+ export const deleteChildProfile=async(req,res,next)=>{
+ try {
+   const child=await User.findById(req.params.id);
+   if(!child || child.parentId.toString()!==req.user.id){
+    return res.status(403).json({success:false,message:'profile not found or not authorized'});
+
+   }
+   await User.findByIdAndDelete(req.params.id);
+   res.status(200).json({
+    success:true,
+    message:'member has been removed.',
+   });
+  
+ } catch (error) {
+  res.status(500).json({
+    success:false,
+    message:'server error'
+  });
+  
+ }
+ }
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // ✅ useEffect aur useState add karein
+import axios from 'axios'; // ✅ axios add karein
 import '../../styles/Dashboard/Analytic.css';
 
-// SVG Icons (in-component for simplicity, can be moved to a separate file)
+// --- SVG Icons (purane waale) ---
 const UsersIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
 );
@@ -19,18 +20,53 @@ const MessageIcon = () => (
 );
 
 
+// ✅ NAYA SVG ICON
+const OnlineIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path><path d="M12 16.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"></path></svg>
+);
+
+
 function AnalyticsDashboard() {
+  
+  // ✅ DUMMY DATA ko STATE se replace karein
+  const [stats, setStats] = useState({
+    totalMembers: 4,
+    activeAlerts: 1,
+    locationsTracked: 3,
+    messagesToday: 28,
+    onlineMembersCount: 2, // Default value
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Yeh data abhi bhi dummy hai, isko bhi API se laa sakte hain
   const recentActivities = [
     { id: 1, user: 'Aarav', action: 'sent an emergency SOS.', time: '2 mins ago', type: 'alert' },
     { id: 2, user: 'Priya', action: 'checked in from School.', time: '15 mins ago', type: 'location' },
     { id: 3, user: 'Admin', action: 'updated family settings.', time: '1 hour ago', type: 'setting' },
-    { id: 4, user: 'Rohan', action: 'sent a message to family group.', time: '3 hours ago', type: 'message' },
-    { id: 5, user: 'Priya', action: 'left the geofence "Home".', time: '5 hours ago', type: 'location' },
   ];
+  
+  // ✅ API se data fetch karein
+  useEffect(() => {
+    const fetchStats = async () => {
+        try {
+            // Maan lijiye aapka stats wala route yeh hai
+            const { data } = await axios.get('/api/v1/dashboard/stats', { withCredentials: true });
+            if (data.success) {
+                setStats(data.stats);
+            }
+        } catch (error) {
+            console.error("Stats fetch karne me error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchStats();
+  }, []);
+
 
   return (
     <div className="dashboard-container">
-      {/* Page Header */}
+      {/* Page Header (No change) */}
       <div className="dashboard-header">
         <h1>Analytics & Dashboard</h1>
         <p>Welcome back! Here's a summary of your family's activity.</p>
@@ -38,70 +74,96 @@ function AnalyticsDashboard() {
 
       {/* Stats Grid */}
       <div className="stats-grid">
+        {/* Total Members (No change) */}
         <div className="stat-card">
           <div className="stat-icon-wrapper" style={{ backgroundColor: 'rgba(79, 70, 229, 0.1)', color: 'rgb(79, 70, 229)' }}>
             <UsersIcon />
           </div>
-          <div className="stat-value">4</div>
+          <div className="stat-value">{loading ? '...' : stats.totalMembers}</div>
           <div className="stat-label">Total Members</div>
         </div>
+        
+        {/* ✅ NAYA CARD - ONLINE MEMBERS */}
+        <div className="stat-card online-card"> {/* Special class for styling */}
+          <div className="stat-icon-wrapper" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)' }}>
+            <OnlineIcon />
+          </div>
+          <div className="stat-value">{loading ? '...' : stats.onlineMembersCount}</div>
+          <div className="stat-label">Members Online</div>
+        </div>
+
+        {/* Active Alerts (No change) */}
         <div className="stat-card">
           <div className="stat-icon-wrapper" style={{ backgroundColor: 'rgba(217, 48, 37, 0.1)', color: 'rgb(217, 48, 37)' }}>
             <AlertIcon />
           </div>
-          <div className="stat-value">1</div>
+          <div className="stat-value">{loading ? '...' : stats.activeAlerts}</div>
           <div className="stat-label">Active Alerts</div>
         </div>
+        
+        {/* Locations Tracked (No change) */}
         <div className="stat-card">
           <div className="stat-icon-wrapper" style={{ backgroundColor: 'rgba(22, 163, 74, 0.1)', color: 'rgb(22, 163, 74)' }}>
             <LocationIcon />
           </div>
-          <div className="stat-value">3</div>
+          <div className="stat-value">{loading ? '...' : stats.locationsTracked}</div>
           <div className="stat-label">Locations Tracked</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon-wrapper" style={{ backgroundColor: 'rgba(2, 132, 199, 0.1)', color: 'rgb(2, 132, 199)' }}>
-            <MessageIcon />
-          </div>
-          <div className="stat-value">28</div>
-          <div className="stat-label">Messages Today</div>
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="charts-section">
-        <div className="chart-card">
-          <h3>Weekly Activity</h3>
-          <p className="chart-subtitle">SOS alerts and check-ins over the last 7 days.</p>
-          <div className="chart-placeholder">
-            {/* Placeholder for a real chart library like Chart.js or Recharts */}
-            <img src="https://i.imgur.com/5z2Z2Yt.png" alt="A line graph showing weekly activity trends" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+      {/* --- ✅✅✅ ONLINE MEMBERS KI LIST (MAIN CONTENT AREA) ✅✅✅ --- */}
+      <div className="main-content-area">
+        <div className="online-list-card">
+          <div className="online-list-header">
+            <h3>Who's Online Right Now?</h3>
+            <span className="online-dot"></span>
+          </div>
+          <div className="online-members-list">
+            {/* Yeh list bhi API se aani chahiye, abhi ke liye dummy */}
+            <div className="online-member">
+                <img src="https://i.pravatar.cc/150?img=12" alt="Aarav" className="avatar" />
+                <span className="member-name">Aarav Jha</span>
+                <span className="status-dot online"></span>
+            </div>
+            <div className="online-member">
+                <img src="https://i.pravatar.cc/150?img=1" alt="Admin" className="avatar" />
+                <span className="member-name">Abhay Jha (You)</span>
+                <span className="status-dot online"></span>
+            </div>
+            <div className="online-member">
+                <img src="https://i.pravatar.cc/150?img=25" alt="Priya" className="avatar" />
+                <span className="member-name">Priya Verma</span>
+                <span className="status-dot away"></span>
+                <span className="status-text">Away</span>
+            </div>
           </div>
         </div>
-        <div className="chart-card">
-          <h3>Member Usage</h3>
-          <p className="chart-subtitle">Activity distribution by family member.</p>
-          <div className="chart-placeholder">
-             {/* Placeholder for a real chart library */}
-             <img src="https://i.imgur.com/eBf2gH0.png" alt="A bar chart showing member usage" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
-          </div>
+        
+        {/* Recent Activity Table (Iske Bagal Mein) */}
+        <div className="activity-table-card">
+          <h3>Recent Activity</h3>
+          <ul className="activity-list">
+            {recentActivities.map(activity => (
+              <li key={activity.id} className="activity-item">
+                <div className="activity-details">
+                  <span className="activity-user">{activity.user}</span>
+                  <span className="activity-action">{activity.action}</span>
+                </div>
+                <div className="activity-time">{activity.time}</div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-      
-      {/* Recent Activity Table */}
-      <div className="activity-table-card">
-        <h3>Recent Activity</h3>
-        <ul className="activity-list">
-          {recentActivities.map(activity => (
-            <li key={activity.id} className="activity-item">
-              <div className="activity-details">
-                <span className="activity-user">{activity.user}</span>
-                <span className="activity-action">{activity.action}</span>
-              </div>
-              <div className="activity-time">{activity.time}</div>
-            </li>
-          ))}
-        </ul>
+
+      {/* Charts Section (No change) */}
+      <div className="charts-section">
+        <div className="chart-card">
+            {/* ... */}
+        </div>
+        <div className="chart-card">
+            {/* ... */}
+        </div>
       </div>
     </div>
   );

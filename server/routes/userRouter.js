@@ -1,10 +1,10 @@
 import express from 'express';
-import { register, verifyOTP,login,logout, forgotPassword , verifyChildOtp } from '../controllers/userController.js';
+import { register, verifyOTP,login,logout, forgotPassword , verifyChildOtp ,getAllMyChildren,updateChildProfile,deleteChildProfile} from '../controllers/userController.js';
 import { getUser } from '../controllers/userController.js';
 import { resetPassword } from '../controllers/userController.js';
 import {createChildUser} from '../controllers/userController.js';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
-
+import { checkPermission } from '../middleware/permission.js';
 
 const router = express.Router();
 
@@ -32,5 +32,24 @@ router.post(
     authorizeRoles("admin", "parent"),    // Check karega ki role sahi hai
     verifyChildOtp                        // Controller ko call karega
 );
+
+router.get(
+    '/admin/my-children',
+    isAuthenticated,
+    authorizeRoles('admin','parent'),
+    getAllMyChildren
+);
+
+router.route('/admin/child/:id').put(
+    isAuthenticated,
+    authorizeRoles('admin','parent'),
+    updateChildProfile
+).delete(
+    isAuthenticated,
+    authorizeRoles('admin','parent'),
+    deleteChildProfile
+
+);
+
 
 export default router;

@@ -6,10 +6,10 @@ import { connection } from "./database/dbconnection.js";
 import { errorMiddleware } from "./middleware/error.js";
 import userRouter from "./routes/userRouter.js";
 import dashboardRoutes from './routes/dashboardRoutes.js'; 
-
+config({ path: "./config.env" });
 
 export const app = express();
-config({ path: "./config.env" });
+
 
 
 app.use(
