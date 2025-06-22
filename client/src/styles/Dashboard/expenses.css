@@ -1,0 +1,193 @@
+/* HouseholdExpenses.css */
+
+/* -- Main Container & Layout -- */
+.expenses-container {
+    padding: 2rem;
+    background-color: #f7fafc; /* Light gray background */
+    font-family: 'Inter', sans-serif;
+    color: #2d3748; /* Dark gray text */
+}
+
+.main-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1a202c;
+}
+
+/* -- Summary Cards -- */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-left: 5px solid #4299e1; /* Blue accent */
+}
+
+.card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: #718096; /* Medium gray */
+    font-weight: 500;
+}
+
+.card p {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+/* -- Charts Section -- */
+.charts-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.chart-container h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* -- Data Section (Form & Table) -- */
+.data-section {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+}
+
+/* -- Expense Form -- */
+.expense-form-container, .expense-table-container {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.expense-form-container h3, .expense-table-container h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.expense-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.expense-form input, .expense-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.expense-form input:focus, .expense-form select:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+}
+
+.expense-form button {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #3182ce; /* Primary blue button */
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.expense-form button:hover {
+    background-color: #2b6cb0;
+}
+
+/* -- Expense Table -- */
+.expense-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.expense-table th, .expense-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.expense-table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #718096;
+    background-color: #f7fafc;
+}
+
+.expense-table tbody tr:hover {
+    background-color: #edf2f7;
+}
+
+.category-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+}
+.category-badge.food { background-color: #FF8042; }
+.category-badge.utilities { background-color: #0088FE; }
+.category-badge.transport { background-color: #FFBB28; }
+.category-badge.entertainment { background-color: #AF19FF; }
+.category-badge.education { background-color: #00C49F; }
+.category-badge.health { background-color: #FF1943; }
+.category-badge.other { background-color: #718096; }
+
+
+.delete-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    border: 1px solid #e53e3e;
+    color: #e53e3e;
+    background-color: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.delete-btn:hover {
+    background-color: #e53e3e;
+    color: white;
+}
+
+/* -- Responsive Design -- */
+@media (max-width: 1200px) {
+    .data-section {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+}

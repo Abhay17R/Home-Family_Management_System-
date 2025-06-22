@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import OtpVerification from "./pages/OtpVerification";
 import DashboardLayout from "./components/DashboardLayout";
 import AddChild from "./pages/dashboard/AddChild";
+import HouseHoldExpense from "./pages/dashboard/Expenses.jsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -101,6 +102,7 @@ const AppRoutes = () => {
           <Route index element={<DashboardHome />} />
           
           {/* Child Route 2: Add Child Page. URL: /dashboard/add-child */}
+          <Route path="expenses"element={<HouseHoldExpense />} />
           <Route path="add-child" element={<AddChild />} />
           <Route path="manage-children" element={<ManageChildren />} /> 
           <Route path="otp-child/:email" element={<OtpChild />} />

@@ -115,7 +115,7 @@ const About = () => {
                 <a href="https://www.linkedin.com/in/abhay-kumar-jha-a1a9b9303/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                   <FaLinkedin />
                 </a>
-                <a href="https://github.com/Abhayjh132" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <a href="https://github.com/Abhay17R" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                   <FaGithub />
                 </a>
               </div>
