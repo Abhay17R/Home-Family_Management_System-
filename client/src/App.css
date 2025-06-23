@@ -60,13 +60,7 @@ body {
   min-height: 100vh;
 }
 
-.header-container {
-  width: calc(100% - 260px); /* Full width minus sidebar width */
-  position: fixed;
-  top: 0;
-  left: 260px; /* Position it next to the sidebar */
-  z-index: 100;
-}
+
 
 .page-content {
   margin-top: 80px; /* Same as header height */
@@ -164,7 +158,7 @@ body {
 
 /* --- HEADER STYLES --- */
 .header {
-  height: 80px;
+  min-height:72px;
   background-color: var(--header-bg);
   border-bottom: 1px solid var(--border-color);
   display: flex;
