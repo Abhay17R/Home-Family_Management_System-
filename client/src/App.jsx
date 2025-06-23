@@ -6,6 +6,7 @@ import "./App.css";
 // AppRoutes component ke andar yeh apne aap context se mil jaata hai.
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import OtpChild from "./pages/dashboard/OtpChild";
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Components & Pages
 import Intro from "./pages/intro";
@@ -21,6 +22,7 @@ import HouseHoldExpense from "./pages/dashboard/Expenses.jsx";
 import SecuritySettings from "./pages/dashboard/Settings.jsx";
 import LocationDashboard from "./pages/dashboard/Location.jsx";
 import FileManager from "./pages/dashboard/document.jsx";
+import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 
 import  AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard.jsx";
 import  EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
@@ -28,16 +30,16 @@ import  EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { Context } from "./context/Context.jsx";
+import { Context, ContextProvider } from "./context/Context.jsx";
 
 
 // Ek simple component jo dashboard ke home par dikhega
-const DashboardHome = () => (
-  <div style={{ padding: '2rem', textAlign: 'center' }}>
-    <h2>Welcome to your Dashboard!</h2>
-    <p>Please select an option from the sidebar to continue.</p>
-  </div>
-);
+// const DashboardHome = () => (
+//   <div style={{ padding: '2rem', textAlign: 'center' }}>
+//     <h2>Welcome to your Dashboard!</h2>
+//     <p>Please select an option from the sidebar to continue.</p>
+//   </div>
+// );
 
 
 // AppRoutes component routing ko handle karega
@@ -74,6 +76,7 @@ const AppRoutes = () => {
 
   return (
     <div className={`app-container ${theme}`}>
+      
       <Routes>
         {/* ===== PUBLIC ROUTES ===== */}
         <Route path="/" element={<Intro />} />
@@ -112,9 +115,9 @@ const AppRoutes = () => {
            <Route path="emergency"element={<EmergencyAlertSystem />} />
            <Route path="location"element={<LocationDashboard/>} />
           <Route path="reports"element={<AnalyticsDashboard/>} />
-         
+          <Route path="security"element={<SecuritySettings />} />
           <Route path="add-child" element={<AddChild />} />
-        
+          <Route path="documents" element={<FileManager/>} />
           
           <Route path="manage-children" element={<ManageChildren />} /> 
           <Route path="otp-child/:email" element={<OtpChild />} />
@@ -141,7 +144,9 @@ const App = () => {
   return (
     // Router ko sabse top level par rakhein
     <Router>
+       <AuthProvider>
       <AppRoutes />
+      </AuthProvider>
     </Router>
   );
 };

@@ -1,0 +1,188 @@
+/* --- Main Layout --- */
+.location-dashboard {
+    padding: 2rem;
+    background-color: #f4f7fa;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.dashboard-content {
+    display: flex;
+    gap: 2rem;
+}
+
+/* --- Member List --- */
+.member-list-container {
+    flex: 0 0 350px; /* Fixed width for the list */
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: calc(100vh - 150px); /* Adjust based on your header height */
+    overflow-y: auto;
+}
+
+.list-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.75rem;
+}
+
+.member-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.member-item:last-child {
+    border-bottom: none;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.member-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+/* Different colors for avatars */
+.member-item:nth-child(2n) .member-avatar { background-color: #28a745; }
+.member-item:nth-child(3n) .member-avatar { background-color: #ffc107; }
+.member-item:nth-child(4n) .member-avatar { background-color: #dc3545; }
+
+
+.member-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.member-status {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.member-status.online {
+    color: #28a745;
+}
+.member-status.offline {
+    color: #dc3545;
+}
+
+
+/* --- Map Container --- */
+.map-container-wrapper {
+    flex: 1; /* Takes remaining space */
+    border-radius: 12px;
+    overflow: hidden; /* Important for border-radius on map */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.map-view {
+    height: calc(100vh - 150px); /* Match list height */
+    width: 100%;
+}
+
+/* --- Privacy Toggle Switch --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #28a745; /* Green for 'on' */
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #28a745;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .dashboard-content {
+        flex-direction: column;
+    }
+    .member-list-container {
+        flex: 0 0 auto; /* Reset flex */
+        width: 100%;
+        height: auto;
+        max-height: 40vh; /* Limit height on small screens */
+    }
+    .map-container-wrapper, .map-view {
+        height: 50vh;
+    }
+}

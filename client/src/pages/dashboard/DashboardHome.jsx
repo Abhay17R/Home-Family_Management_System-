@@ -2,7 +2,9 @@
 
 import React from 'react';
 // Dhyan dein: CSS ka path aapke naye folder structure ke hisaab se hai
-import '../../style/Dashboard/dashboard.css';
+// import '../../style/Dashboard/dashboard.css';
+import '../../styles/Dashboard/dashboard.css'
+
 
 // Dummy data, asli data backend se aayega
 const summaryData = {

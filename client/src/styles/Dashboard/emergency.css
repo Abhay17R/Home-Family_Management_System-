@@ -1,0 +1,226 @@
+/* Main Container and Header */
+.emergency-container {
+    padding: 32px;
+    background-color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    color: #334155;
+    min-height: 100vh;
+}
+
+.emergency-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.emergency-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.emergency-header p {
+    font-size: 16px;
+    color: #64748b;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* SOS Button Section */
+.sos-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 48px;
+}
+
+.sos-button {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: none;
+    background-color: #fee2e2;
+    color: #dc2626;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.1);
+}
+
+.sos-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(#ef4444 var(--progress, 0%), transparent var(--progress, 0%));
+    transform: scale(1.1);
+    z-index: -1;
+    transition: background 0.1s linear;
+}
+
+.sos-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(220, 38, 38, 0.2);
+}
+
+.sos-button:active {
+    transform: scale(1);
+}
+
+.sos-button-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.sos-button-content span {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.sos-instructions {
+    margin-top: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #475569;
+}
+
+/* Alert History Section */
+.alert-history-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.alert-history-card h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.alert-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-user {
+    font-weight: 500;
+    color: #334155;
+}
+
+.history-date {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.history-status {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-resolved {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+.status-active {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+.no-history {
+    text-align: center;
+    padding: 24px;
+    color: #94a3b8;
+}
+
+/* Alert Active State Styling */
+.alert-active-bg {
+    background: linear-gradient(45deg, #7f1d1d, #b91c1c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.alert-active-content {
+    max-width: 600px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+.pulsing-icon {
+    animation: pulse 1.5s infinite ease-in-out;
+    margin-bottom: 24px;
+}
+
+.pulsing-icon svg {
+    width: 80px;
+    height: 80px;
+}
+
+.alert-active-content h1 {
+    font-size: 48px;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+}
+
+.alert-active-content p {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 32px;
+}
+
+.cancel-alert-button {
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.cancel-alert-button:hover {
+    background-color: #15803d;
+}
