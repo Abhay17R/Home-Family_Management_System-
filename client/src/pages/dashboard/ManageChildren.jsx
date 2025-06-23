@@ -2,7 +2,8 @@ import React, { useState,useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 // import React, { useState } from 'react';
-import '../../styles/Dashboard/ManageChildren.css'; // Is CSS file ko hum abhi banayenge
+import '../../styles/Dashboard/ManageChildren.css';
+import { useAuth } from "../../hooks/useAuth"; // Is CSS file ko hum abhi banayenge
 
 // --- DUMMY DATA ---
 // Jab aap backend se connect karenge, toh yeh data API se aayega.
@@ -18,7 +19,7 @@ const ManageChildren = () => {
     const [children, setChildren] = useState([]);
     const [loading,setLoading]=useState(true);
     const [error,setError]=useState('');
-
+      const { fetchLoggedInUser } = useAuth();
     useEffect(()=>{
         const fetchChildren =async()=>{
             try {
@@ -63,6 +64,7 @@ const ManageChildren = () => {
                 {...child,permissions:{...child.permissions,[field]:value}}
                 :child
             ));
+              await fetchLoggedInUser();
 
         } catch (error) {
             alert('Failed to update permission.');
