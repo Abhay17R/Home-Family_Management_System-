@@ -1,41 +1,50 @@
-import React, { useContext, useState } from "react";
-// import { Context } from "../main";
-import { Context } from "../context/Context.jsx"; // ✅
+// src/pages/Auth.jsx
 
+import React, { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.js"; // ✅ Sahi hook import
 import Register from "../components/Register";
 import Login from "../components/Login";
-import { FiSun, FiMoon } from "react-icons/fi";
-import "../styles/Auth.css";
+import "../styles/Auth.css"; // Styles import
 
 const Auth = () => {
-  const { isAuthenticated } = useContext(Context);
+  // ✅ Step 1: useAuth se 'user' nikalein
+  const { user } = useAuth();
+  
+  // ✅ Step 2: 'isLogin' state ko define karein
+  // Yeh state Login aur Register tabs ko switch karne ke liye hai
   const [isLogin, setIsLogin] = useState(true);
-  const [theme, setTheme] = useState("dark");
 
-  if (isAuthenticated) return <Navigate to={"/dashboard"} />;
+  // Yeh theme ke liye state hai
+  const [theme, setTheme] = useState("dark"); // Default theme dark
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
+  // ✅ Step 3: 'isAuthenticated' ki jagah 'user' se check karein
+  // Agar user object hai (logged in), to use dashboard bhej do
+  if (user) {
+    return <Navigate to={"/dashboard"} replace />;
+  }
+
+  // Agar logged in nahi hai, to Login/Register UI dikhao
   return (
     <div className={`auth-page-wrapper ${theme}`}>
-      {/* ✅ SAME NAVBAR AS INTRO */}
+      {/* Navbar */}
       <header className="home-header">
-      <h1><Link to="/intro" className="home-link">HOME</Link></h1>
-
-        <div className="header-controls">
-          {/* <Link to="/auth" className="btn btn-secondary">Login</Link> */}
-          {/* <Link to="/auth" className="btn btn-primary">Register</Link> */}
-          {/* <button onClick={toggleTheme} className="theme-toggle-btn">
-            {theme === "light" ? <FiMoon /> : <FiSun />}
-          </button> */}
-        </div>
+        <h1>
+          <Link to="/intro" className="home-link">
+            HOME
+          </Link>
+        </h1>
+        {/* Header controls (agar zaroorat ho to yahan daalein) */}
       </header>
 
+      {/* Main Content */}
       <div className="auth-page">
         <div className="auth-container">
+          {/* Login/Register Switcher */}
           <div className="auth-toggle">
             <button
               className={`toggle-btn ${isLogin ? "active" : ""}`}
@@ -51,6 +60,7 @@ const Auth = () => {
             </button>
           </div>
 
+          {/* Conditional Rendering of Login/Register Component */}
           {isLogin ? (
             <Login setIsLogin={setIsLogin} />
           ) : (
@@ -62,4 +72,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default Auth; 

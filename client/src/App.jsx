@@ -1,12 +1,10 @@
 // src/App.jsx
 
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
-// useNavigate ko BrowserRouter ke andar se use nahi karte, isliye yahan se hata sakte hain.
-// AppRoutes component ke andar yeh apne aap context se mil jaata hai.
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import OtpChild from "./pages/dashboard/OtpChild";
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import {  useAuth } from './hooks/useAuth.js'; // Sahi jagah se import
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 // Components & Pages
 import Intro from "./pages/intro";
@@ -23,111 +21,91 @@ import SecuritySettings from "./pages/dashboard/Settings.jsx";
 import LocationDashboard from "./pages/dashboard/Location.jsx";
 import FileManager from "./pages/dashboard/document.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
-
-import  AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard.jsx";
-import  EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
+import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard.jsx";
+import EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
+import OtpChild from "./pages/dashboard/OtpChild";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
-import { Context, ContextProvider } from "./context/Context.jsx";
 
-
-// Ek simple component jo dashboard ke home par dikhega
-// const DashboardHome = () => (
-//   <div style={{ padding: '2rem', textAlign: 'center' }}>
-//     <h2>Welcome to your Dashboard!</h2>
-//     <p>Please select an option from the sidebar to continue.</p>
-//   </div>
-// );
-
-
-// AppRoutes component routing ko handle karega
+// AppRoutes component routing aur navigation logic handle karega
 const AppRoutes = () => {
-  const { isAuthenticated, user, setUser, setIsAuthenticated, theme } = useContext(Context);
-   
-  // useEffect(() => {
-  //   document.documentElement.setAttribute('data-theme', theme);
-  // }, [theme]);
-  // NOTE: Yeh useEffect aapko login ke baad /dashboard par bhejta hai.
-  // Lekin isse ek problem ho sakti hai: Agar aap /dashboard/add-child par page refresh
-  // karenge, toh yeh aapko wapas /dashboard par bhej dega.
-  // Behtar tareeka hai ki login successful hone par Auth page se navigate karein.
-  
+  // ✅ STEP 1: Sirf 'useAuth' hook ka istemaal karein
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // ✅ STEP 2: Login ke baad automatic redirection ke liye useEffect
   useEffect(() => {
-    if (isAuthenticated) {
-      // Isko abhi ke liye comment kar sakte hain, ya login logic me move kar sakte hain.
-      // navigate("/dashboard"); 
+    // Shuruaati loading poori hone tak intezaar karein
+    if (!isLoading) {
+        
+        // --- LOGIN LOGIC ---
+        if (user) {
+            // Agar user login ho gaya hai aur woh public page par hai,
+            // to use dashboard par bhej do.
+            const publicPaths = ['/auth', '/login', '/intro', '/'];
+            if (publicPaths.includes(window.location.pathname)) {
+                navigate('/dashboard', { replace: true });
+            }
+        } 
+        
+        // --- LOGOUT LOGIC ---
+        else {
+            // Agar user login nahi hai (yaani logout ho chuka hai)
+            // aur woh kisi protected (private) page par hai,
+            // to use login page par bhej do.
+            if (window.location.pathname.startsWith('/dashboard')) {
+                navigate('/login', { replace: true });
+            }
+        }
     }
-  }, [isAuthenticated]);
+}, [user, isLoading, navigate]); // Dependencies
 
-  // Session check karne wala useEffect bilkul sahi hai.
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data } = await axios.get("http://localhost:4000/api/v1/me", {
-          withCredentials: true,
-        });
-        setUser(data.user);
-        setIsAuthenticated(true);
-      } catch (err) {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-    };
-    getUser();
-  }, [setUser, setIsAuthenticated]);
 
+// ✅ Initial loading state handle karna bilkul sahi hai
+if (isLoading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+}
   return (
-    <div className={`app-container ${theme}`}>
+    // Note: Theme ke liye aapko 'user' object se theme nikalni hogi,
+    // ya koi alag context use karna hoga. Abhi ke liye aasan rakhte hain.
+    <div className={`app-container`}> 
       
       <Routes>
         {/* ===== PUBLIC ROUTES ===== */}
-        <Route path="/" element={<Intro />} />
+        {/* Agar user login hai, to in routes se usko dashboard bhej do */}
+        <Route path="/" element={!user ? <Intro /> : <Navigate to="/dashboard" replace />} />
         <Route path="/about" element={<About />} />
-        <Route path="/intro" element={<Intro />} />
-        <Route path="/auth" element={!isAuthenticated ? <Auth /> : <DashboardLayout user={user} theme={theme} />} />
+        <Route path="/intro" element={!user ? <Intro /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
         <Route path="/otp-verification/:email/:phone" element={<OtpVerification />} />
         <Route path="/password/forgot" element={<ForgotPassword />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
         
-        
-        {/* ===== PROTECTED & NESTED DASHBOARD ROUTES ===== */}
-        {/* 
-          1. Yeh hamara Parent Route hai. Yeh self-closing nahi hai (<Route>...</Route>).
-          2. Iska element DashboardLayout hai, jo hamesha dikhega.
-          3. Iske andar ke child routes <Outlet/> ki jagah par render honge.
-        */}
+        {/* ===== PROTECTED DASHBOARD ROUTES ===== */}
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
-            isAuthenticated ? (
-              <DashboardLayout
-                user={user}
-                theme={theme}
-              />
+            user ? (
+              // Ab user object seedha context se aa raha hai, prop ki zaroorat nahi
+              <DashboardLayout /> 
             ) : (
-              <Auth /> // Agar logged in nahi hai to Auth page par bhej do
+              // Agar logged in nahi hai to Auth page par bhej do
+              <Navigate to="/auth" replace /> 
             )
           }
         >
-          {/* Child Route 1: Default Page. Yeh tab dikhega jab URL sirf /dashboard ho */}
+          {/* Dashboard ke andar ke saare child routes */}
           <Route index element={<DashboardHome />} />
-          
-          {/* Child Route 2: Add Child Page. URL: /dashboard/add-child */}
-          <Route path="expenses"element={<HouseHoldExpense />} />
-           <Route path="emergency"element={<EmergencyAlertSystem />} />
-           <Route path="location"element={<LocationDashboard/>} />
-          <Route path="reports"element={<AnalyticsDashboard/>} />
-          <Route path="security"element={<SecuritySettings />} />
+          <Route path="expenses" element={<HouseHoldExpense />} />
+          <Route path="emergency" element={<EmergencyAlertSystem />} />
+          <Route path="location" element={<LocationDashboard />} />
+          <Route path="reports" element={<AnalyticsDashboard />} />
+          <Route path="security" element={<SecuritySettings />} />
           <Route path="add-child" element={<AddChild />} />
-          <Route path="documents" element={<FileManager/>} />
-          
-          <Route path="manage-children" element={<ManageChildren />} /> 
+          <Route path="documents" element={<FileManager />} />
+          <Route path="manage-children" element={<ManageChildren />} />
           <Route path="otp-child/:email" element={<OtpChild />} />
-
-          {/* Aap yahan aur bhi child routes daal sakte hain */}
-          {/* e.g., <Route path="profile" element={<Profile />} /> */}
         </Route>
 
       </Routes>
@@ -136,8 +114,6 @@ const AppRoutes = () => {
         position="bottom-center"
         autoClose={3000}
         hideProgressBar={false}
-        theme={theme}
-        // toggleTheme prop ToastContainer me nahi hota, isliye hata diya.
       />
     </div>
   );
@@ -146,12 +122,12 @@ const AppRoutes = () => {
 
 const App = () => {
   return (
-    // Router ko sabse top level par rakhein
-    <Router>
-       <AuthProvider>
-      <AppRoutes />
-      </AuthProvider>
-    </Router>
+    // ✅ STEP 4: Sirf AuthProvider istemaal karein
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 };
 

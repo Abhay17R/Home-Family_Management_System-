@@ -1,23 +1,23 @@
 // src/pages/OtpVerification.jsx
 
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Navigate, useParams, Link } from "react-router-dom";
+import { Navigate, useParams, useNavigate } from "react-router-dom"; // useNavigate ko import karein
 import { toast } from "react-toastify";
-// import { Context } from "../main";
-import { Context } from "../context/Context.jsx"; // ✅
-
-// Hum ab Auth.css ka istemaal karenge
+import { useAuth } from "../hooks/useAuth.js"; // ✅ Step 1: Sahi hook import karein
 import "../styles/Auth.css";
 
 const OtpVerification = () => {
-  const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
-  const { email, phone } = useParams();
+  // ✅ Step 2: 'useAuth' se zaroori cheezein nikal lein
+  const { user, setUser } = useAuth();
   
-  // Aapka OTP state logic bilkul theek hai
+  const { email, phone } = useParams();
+  const navigate = useNavigate(); // Navigation ke liye
+
+  // OTP state logic bilkul sahi hai
   const [otp, setOtp] = useState(["", "", "", "", ""]);
 
-  // Aapke saare functions (handleChange, handleKeyDown, etc.) bilkul safe hain
+  // OTP input ke functions bilkul sahi hain
   const handleChange = (value, index) => {
     if (!/^\d*$/.test(value)) return;
     const newOtp = [...otp];
@@ -36,14 +36,12 @@ const OtpVerification = () => {
   };
 
   const handleResendOtp = async () => {
-    // Yahan aap resend OTP ki API call kar sakte hain
     toast.info("Resend OTP functionality to be implemented!");
   };
 
   const handleOtpVerification = async (e) => {
     e.preventDefault();
     const enteredOtp = otp.join("");
-    // OTP poora hai ya nahi, yeh check karna ek acchi practice hai
     if (enteredOtp.length !== 5) {
       toast.error("Please enter the complete 5-digit OTP.");
       return;
@@ -59,17 +57,26 @@ const OtpVerification = () => {
         }
       );
       toast.success(res.data.message);
-      setIsAuthenticated(true);
+      
+      // ✅ Step 3: Global state ko naye AuthContext se update karein
       setUser(res.data.user);
+      
+      // ✅ Step 4: User ko dashboard par bhej dein
+      // Kyunki App.jsx mein redirection logic hai, iski shayad zaroorat na pade,
+      // lekin yahan karna zyada direct aur foolproof hai.
+      navigate("/dashboard", { replace: true });
+
     } catch (err) {
       toast.error(err.response.data.message);
-      setIsAuthenticated(false);
-      setUser(null);
+      // Agar OTP galat hai, to user state ko null set karne ki zaroorat nahi
+      // kyunki woh pehle se hi null hai.
     }
   };
 
-  if (isAuthenticated) {
-    return <Navigate to={"/"} />;
+  // ✅ Step 5: 'isAuthenticated' ki jagah 'user' se check karein
+  // Agar user pehle se logged in hai, to use dashboard bhej do
+  if (user) {
+    return <Navigate to={"/dashboard"} replace />;
   }
 
   return (
@@ -93,7 +100,7 @@ const OtpVerification = () => {
                 onChange={(e) => handleChange(e.target.value, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 required
-                inputMode="numeric" // Mobile par numeric keyboard dikhayega
+                inputMode="numeric"
               />
             ))}
           </div>

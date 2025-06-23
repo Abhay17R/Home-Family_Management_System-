@@ -1,24 +1,23 @@
 // src/pages/ForgotPassword.jsx
 
-import React, { useContext, useState } from "react";
-// import { Context } from "../main";
-import { Context } from "../context/Context.jsx"; // ✅
-
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom"; // Link import karein
-
-// Hum ab Auth.css ka istemaal karenge
-import "../styles/Auth.css";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.js"; // ✅ Step 1: Sahi hook import karein
+import "../styles/Auth.css"; // Styles import
 
 const ForgotPassword = () => {
-  const { isAuthenticated } = useContext(Context);
+  // ✅ Step 2: useAuth se 'user' object nikalein
+  const { user } = useAuth();
+  
+  // Yeh local state hai, iska context se koi lena-dena nahi. Yeh bilkul sahi hai.
   const [email, setEmail] = useState("");
 
-  // Aapka backend logic bilkul safe hai
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     try {
+      // Yeh logic bilkul sahi hai aur ismein koi badlaav ki zaroorat nahi hai.
       const res = await axios.post(
         "http://localhost:4000/api/v1/password/forgot",
         { email },
@@ -28,13 +27,21 @@ const ForgotPassword = () => {
         }
       );
       toast.success(res.data.message);
+      setEmail(""); // Success ke baad field ko khali kar dein
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 
+  // ✅ Step 3: 'isAuthenticated' ki jagah 'user' se check karein
+  // Agar user pehle se logged in hai, to use yeh page mat dikhao,
+  // use seedha dashboard bhej do.
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Agar logged in nahi hai, to Forgot Password form dikhao.
   return (
-    // Hum Auth page ki classes ka hi istemaal kar rahe hain
     <div className="auth-page">
       <div className="auth-container">
         <form onSubmit={handleForgotPassword} className="auth-form">
@@ -55,9 +62,7 @@ const ForgotPassword = () => {
             />
           </div>
 
-          <button type="submit">
-            Send Reset Link
-          </button>
+          <button type="submit">Send Reset Link</button>
 
           <div className="bottom-links">
             <Link to="/auth" className="link-style">

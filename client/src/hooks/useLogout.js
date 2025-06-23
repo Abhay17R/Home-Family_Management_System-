@@ -1,37 +1,38 @@
-// src/hooks/useAuth.js
+// src/hooks/useLogout.js
 
-import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { Context } from "../context/Context"; // Sahi path check kar lein
+import axios from 'axios';
+import { useAuth } from './useAuth';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-// Yeh hamara custom hook hai
 export const useLogout = () => {
-    // Hook ke andar hum doosre hooks use kar sakte hain
-    const { setIsAuthenticated, setUser } = useContext(Context);
-    const navigate = useNavigate();
+    const { setUser } = useAuth();
+    const navigate = useNavigate(); // ✅ Make sure this is here
 
-    // Hum logout logic ko ek function mein daal denge
     const logout = async () => {
         try {
-            const res = await axios.get("http://localhost:4000/api/v1/logout", {
+            // Backend se cookie clear karwayein
+            await axios.get('http://localhost:4000/api/v1/logout', {
                 withCredentials: true,
             });
-            toast.success(res.data.message);
-            // Global state update karein
+            
+            // Frontend state ko null karein
             setUser(null);
-            setIsAuthenticated(false);
-            // User ko redirect karein
-            navigate('/intro'); 
-        } catch (err) {
-            toast.error(err.response.data.message || "Logout failed");
-            console.error(err);
+            
+            // Success message dikhayein
+            toast.success("Logged out successfully.");
+            
+            // ✅ --- SABSE ZAROORI LINE --- ✅
+            // User ko login page par redirect karein
+            navigate('/login', { replace: true }); 
+
+        } catch (error) {
+            // Agar logout fail hota hai (jo ki rare hai), to error dikhayein
+            // Aur user ko state me wapas daal sakte hain ya kuch nahi kar sakte
+            toast.error("Logout failed. Please try again.");
+            console.error('Logout error:', error);
         }
     };
 
-    // Hum is hook se 'logout' function ko return karenge
-    return { logout }; 
-    // Isse future mein login, register jaise functions bhi return kar sakte hain
-    // return { login, logout, register };
+    return { logout };
 };

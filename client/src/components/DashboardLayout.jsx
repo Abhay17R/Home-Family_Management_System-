@@ -8,11 +8,11 @@ import Header from './Header';
 // Nayi CSS file jise hum abhi banayenge
 import './DashboardLayout.css'; 
 
-const DashboardLayout = ({ user, theme, toggleTheme }) => {
+const DashboardLayout = ({  theme, toggleTheme }) => {
   return (
     <div className="dashboard-layout">
       {/* Sidebar fixed hai, isliye woh apne aap sahi jagah par aa jayega */}
-      <Sidebar user={user} />
+      <Sidebar/>
 
       {/* Yeh container main content (Header + Page) ko hold karega */}
       {/* Iski CSS isko sidebar ke bagal me rakhegi */}

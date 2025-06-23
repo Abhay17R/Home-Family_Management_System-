@@ -1,21 +1,20 @@
 // Intro.jsx
 
-// ✅ STEP 1: Zaroori cheezein import karo
-import React, { useState, useEffect, useContext } from "react"; // useContext ko add kiya
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Context } from "../context/Context.jsx"; // Hamare global Context ko import kiya
+import { useAuth } from "../hooks/useAuth.js"; // ✅ STEP 1: Naya, sahi hook import kiya
 
 import "./intro.css";
 import { FiSun, FiMoon, FiArrowDownCircle } from 'react-icons/fi';
-// import { useTheme } from '../context/ThemeContext'; //
 import { 
   FaChartPie, FaGraduationCap, FaShoppingCart, FaComments, FaMapMarkedAlt, FaExclamationTriangle,
   FaFolderOpen, FaNotesMedical, FaVoteYea
 } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 
+// --- FEATURE DATA (No Changes Here) ---
 const featureData = [
-  // ... (Your featureData remains unchanged)
+  // ... (Aapka poora featureData jaisa tha waisa hi hai)
   {
     id: "expense",
     Icon: FaChartPie,
@@ -72,14 +71,13 @@ const featureData = [
   }
 ];
 
+// --- FEATURE SECTION COMPONENT (No Changes Here) ---
 const FeatureSection = ({ id, Icon, title, description, index }) => {
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.2,
   });
-
   const isReversed = index % 2 !== 0;
-
   return (
     <section 
       id={id} 
@@ -97,16 +95,16 @@ const FeatureSection = ({ id, Icon, title, description, index }) => {
   );
 };
 
+
+// --- INTRO COMPONENT (Only Auth Logic Changed) ---
 const Intro = () => {
   const [theme, setTheme] = useState("dark");
   const [isHeroAnimated, setIsHeroAnimated] = useState(false);
   
-  // ✅ STEP 2: Global Context se login status nikaalo
-  const { isAuthenticated } = useContext(Context);
+  // ✅ STEP 2: Naye hook se 'user' object nikaalo
+  const { user } = useAuth();
 
-  // ❌ Iski ab koi zaroorat nahi, yeh purana tareeka tha. Isko hata diya.
-  // const isLoggedIn = !!localStorage.getItem('userToken');
-
+  // Baaki saare useEffects aur functions waise ke waise hi hain
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsHeroAnimated(true);
@@ -129,12 +127,12 @@ const Intro = () => {
         <h1>HOME</h1>
         <div className="header-controls">
           
-          {/* ✅ STEP 3: Header mein naya variable `isAuthenticated` use karo */}
-          {isAuthenticated ? (
-            // Agar user logged in hai, to "Dashboard" button dikhao
+          {/* ✅ STEP 3: Header mein 'isAuthenticated' ki jagah 'user' ka istemaal karo */}
+          {user ? (
+            // Agar user object hai (logged in hai), to "Dashboard" button dikhao
             <Link to="/dashboard" className="btn btn-primary">Dashboard</Link>
           ) : (
-            // Agar nahi, to purana "Login" button dikhao
+            // Agar nahi (null hai), to "Login" button dikhao
             <Link to="/auth" className="btn btn-secondary">Login</Link>
           )}
 
@@ -145,6 +143,7 @@ const Intro = () => {
         </div>
       </header>
 
+      {/* --- MAIN CONTENT (No Changes Here) --- */}
       <main className="home-main">
         <div className={`hero-section ${isHeroAnimated ? 'is-animated' : ''}`}>
           <h2 className="hero-title">Welcome to <span>HOME</span></h2>
@@ -179,9 +178,9 @@ const Intro = () => {
         </div>
       </main>
 
+      {/* --- FOOTER (No Changes Here) --- */}
       <footer className="home-footer">
         © {new Date().getFullYear()} HOME - The Family Management System | Developed with ❤️ by Abhay Kumar Jha {" "}
-        {/* Email: <a href="mailto:abhayjh132@gmail.com">abhayjh132@gmail.com</a> */}
       </footer>
     </div>
   );
