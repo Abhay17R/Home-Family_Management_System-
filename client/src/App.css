@@ -1,22 +1,10 @@
 /* --- THEME VARIABLES --- */
-:root, [data-theme='light'] {
-  --bg-primary: #f4f7fa;          /* Main background color of the page */
-  --bg-secondary: #ffffff;        /* Background of cards, modals, etc. */
-  --text-primary: #1e293b;        /* Main text color */
-  --text-secondary: #64748b;      /* Lighter text for subheadings */
-  --sidebar-bg: #1e293b;          /* Sidebar background color */
-  --sidebar-text: #cbd5e1;        /* Sidebar link text color */
-  --sidebar-text-active: #ffffff; /* Active sidebar link text color */
-  --sidebar-bg-active: #334155;  /* Active sidebar link background */
-  --header-bg: #ffffff;           /* Header background color */
-  --border-color: #e2e8f0;        /* Border color for elements */
-  --shadow-color: rgba(0, 0, 0, 0.1); /* Shadow for cards and header */
-  --toggle-bg: #334155;          /* Theme toggle button background */
-  --toggle-fg: #f1c40f;          /* Sun icon color */
-  --scrollbar-track: var(--sidebar-bg);
-  --scrollbar-thumb: var(--sidebar-bg-active);
-}
+:root,  /* Shadow for cards and header */
+  
+  
+  /* --toggle-fg: #f1c40f;           */
 
+  
 [data-theme='dark'] {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
@@ -29,8 +17,8 @@
   --header-bg: #1e293b;
   --border-color: #334155;
   --shadow-color: rgba(0, 0, 0, 0.4);
-  --toggle-bg: #e2e8f0;
-  --toggle-fg: #f39c12;
+  /* --toggle-bg: #e2e8f0; */
+  /* --toggle-fg: #f39c12; */
   --scrollbar-track: var(--sidebar-bg);
   --scrollbar-thumb: var(--sidebar-bg-active);
 }
@@ -185,6 +173,7 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--text-primary);
+  
 }
 
 .header-title {
@@ -194,43 +183,9 @@ body {
 }
 
 /* --- THEME TOGGLE BUTTON --- */
-.theme-toggle-button {
-  background: var(--toggle-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 30px;
-  cursor: pointer;
-  display: flex;
-  font-size: 0.5rem;
-  justify-content: space-between;
-  overflow: hidden;
-  padding: 0.5rem;
-  position: relative;
-  width: 5rem;
-  height: 2.5rem;
-}
 
-.theme-toggle-button svg {
-  height: auto;
-  width: 1.5rem;
-  transition: all 0.3s linear;
-}
 
-.theme-toggle-button .sun {
-  transform: translateY(0);
-}
 
-.theme-toggle-button .moon {
-  transform: translateY(-100px); /* Hide by default */
-}
-
-/* When theme is dark, hide sun and show moon */
-.theme-toggle-button.dark .sun {
-    transform: translateY(100px);
-}
-
-.theme-toggle-button.dark .moon {
-    transform: translateY(0);
-}
 
 /* --- PAGE STYLES --- */
 .page-container {

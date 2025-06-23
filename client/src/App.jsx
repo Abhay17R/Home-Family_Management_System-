@@ -45,11 +45,15 @@ import { Context, ContextProvider } from "./context/Context.jsx";
 // AppRoutes component routing ko handle karega
 const AppRoutes = () => {
   const { isAuthenticated, user, setUser, setIsAuthenticated, theme } = useContext(Context);
-
+   
+  // useEffect(() => {
+  //   document.documentElement.setAttribute('data-theme', theme);
+  // }, [theme]);
   // NOTE: Yeh useEffect aapko login ke baad /dashboard par bhejta hai.
   // Lekin isse ek problem ho sakti hai: Agar aap /dashboard/add-child par page refresh
   // karenge, toh yeh aapko wapas /dashboard par bhej dega.
   // Behtar tareeka hai ki login successful hone par Auth page se navigate karein.
+  
   useEffect(() => {
     if (isAuthenticated) {
       // Isko abhi ke liye comment kar sakte hain, ya login logic me move kar sakte hain.
