@@ -1,4 +1,9 @@
 /* --- THEME VARIABLES --- */
+.page-content-wrapper {
+  max-width: 900px;
+  width: 100%; /* Taaki choti screen par poori jagah le */
+  margin: 0 auto; /* Yeh isko horizontally center karega */
+}
 :root,  /* Shadow for cards and header */
   
   

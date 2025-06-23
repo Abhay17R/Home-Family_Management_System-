@@ -22,9 +22,12 @@ const DashboardLayout = ({ user, theme, toggleTheme }) => {
         <Header theme={theme} toggleTheme={toggleTheme} />
         
         {/* Yahan aapke child pages (AddChild, Profile, etc.) render honge */}
+         <div className="page-content-wrapper"></div>
         <main className="page-outlet">
           <Outlet />
+          
         </main>
+         <div className="page-content-wrapper"></div>
       </div>
     </div>
   );
