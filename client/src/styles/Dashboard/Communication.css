@@ -1,0 +1,104 @@
+/* ---- Main Layout & Grid ---- */
+.communication-container {
+  display: grid;
+  grid-template-columns: 300px 1fr 320px; /* 3-column layout */
+  height: calc(100vh - 60px); /* Adjust 60px to your header's height */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #111b21;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.panel-header h2 { font-size: 1.2rem; }
+
+.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.avatar-small { width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; }
+
+/* ---- Left Panel: Chat List ---- */
+.chat-list-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.search-bar { padding: 8px 12px; background: #f0f2f5; }
+.search-bar input { width: 100%; padding: 8px; border-radius: 8px; border: none; background: #fff; }
+
+.chat-list { flex-grow: 1; overflow-y: auto; }
+.chat-list-item { display: flex; align-items: center; padding: 12px; cursor: pointer; border-bottom: 1px solid #f0f2f5; }
+.chat-list-item:hover { background-color: #f5f5f5; }
+.chat-list-item.active { background-color: #e8f0fe; }
+
+.chat-info { flex-grow: 1; margin: 0 10px; }
+.chat-name { font-weight: 600; margin: 0; }
+.last-message { font-size: 0.9rem; color: #667781; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-meta { text-align: right; font-size: 0.75rem; color: #8696a0; }
+.unread-count { background-color: #25d366; color: white; border-radius: 50%; padding: 2px 6px; font-weight: bold; font-size: 0.7rem; margin-top: 4px; }
+
+/* ---- Center Panel: Chat Window ---- */
+.chat-window-panel { display: flex; flex-direction: column; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); } /* Subtle BG pattern */
+
+.chat-header { background: #f0f2f5; cursor: pointer; }
+.chat-header .chat-info { margin-left: 15px; }
+.chat-header .chat-status { font-size: 0.8rem; color: #667781; }
+.chat-actions span { font-size: 1.5rem; margin-left: 15px; color: #54656f; cursor: pointer; }
+
+.message-area { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+
+.message-wrapper { display: flex; max-width: 70%; gap: 10px; }
+.message-wrapper.sent { align-self: flex-end; flex-direction: row-reverse; }
+.message-wrapper.received { align-self: flex-start; }
+
+.message-bubble { background: #fff; padding: 8px 12px; border-radius: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); }
+.message-wrapper.sent .message-bubble { background-color: #d9fdd3; }
+
+.sender-name { font-weight: bold; font-size: 0.8rem; color: #3498db; margin-bottom: 4px; }
+.reply-preview { border-left: 2px solid #3498db; padding-left: 8px; margin-bottom: 5px; font-size: 0.8rem; color: #666; background: rgba(0,0,0,0.03); border-radius: 4px; padding: 4px 8px; }
+.message-text { margin: 0; word-wrap: break-word; }
+.reactions { font-size: 0.8rem; margin-top: 5px; }
+.reactions span { background: rgba(0,0,0,0.05); padding: 2px 5px; border-radius: 10px; margin-right: 5px; }
+
+/* Poll styles */
+.poll-bubble { width: 100%; }
+.poll-question { font-weight: bold; margin-bottom: 10px; }
+.poll-option { margin-bottom: 8px; font-size: 0.9rem; }
+.poll-bar-bg { background: #e0e0e0; border-radius: 5px; height: 10px; margin-top: 4px; }
+.poll-bar-fg { background: #4caf50; height: 100%; border-radius: 5px; }
+
+
+.message-input-area { display: flex; align-items: center; padding: 10px 16px; background: #f0f2f5; }
+.message-input-area input { flex-grow: 1; padding: 12px; border: none; border-radius: 8px; margin: 0 10px; }
+.message-input-area button { background: none; border: none; font-size: 1.5rem; color: #54656f; cursor: pointer; }
+.send-btn { color: #128c7e !important; }
+
+/* ---- Right Panel: Chat Details ---- */
+.chat-details-panel { background: #fff; border-left: 1px solid #e0e0e0; padding: 20px; overflow-y: auto; }
+.details-section { margin-bottom: 25px; }
+.details-section h4 { border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 12px; font-size: 1rem; color: #333; }
+.pinned-item { background: #f5f6f6; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9rem; }
+.create-poll input { width: 100%; margin-bottom: 8px; }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 5px; }
+.media-grid img, .media-grid .view-all { width: 100%; height: 60px; object-fit: cover; border-radius: 8px; }
+.view-all { background: #e9ecef; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+.members-list div { display: flex; align-items: center; padding: 5px 0; font-size: 0.9rem; }
+.child-mode a { color: #007bff; text-decoration: none; font-weight: 600; font-size: 0.9rem;}
+
+/* ---- Responsive ---- */
+@media (max-width: 1200px) {
+  .communication-container { grid-template-columns: 300px 1fr; }
+  .chat-details-panel { display: none; } /* Hide right panel on smaller screens */
+}
+@media (max-width: 768px) {
+  .communication-container { grid-template-columns: 1fr; }
+  .chat-list-panel { display: none; } /* On mobile, you'd show this first, then navigate to the chat window */
+  /* Add more mobile-specific styles here, e.g., showing a back button in the chat header */
+}
