@@ -92,4 +92,102 @@
 .action-btn.danger:hover { background-color: var(--status-pending); color: white; }
 
 /* --- Responsive Design (No Changes Here) --- */
-@media (max-width: 768px) { .shopping-container { padding: 1rem; } .shopping-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .shopping-header h1 { font-size: 1.8rem; } .add-order-btn { width: 100%; justify-content: center; } .orders-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .shopping-container { padding: 1rem; } .shopping-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .shopping-header h1 { font-size: 1.8rem; } .add-order-btn { width: 100%; justify-content: center; } .orders-grid { grid-template-columns: 1fr; } }/* Purani saari CSS jaisi hai waisi hi rakhein */
+/* ... (your existing CSS) ... */
+
+/* --- Header Section (Updated for search bar) --- */
+.shopping-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1.5rem; /* Add gap between items */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+}
+
+.shopping-header h1 {
+    color: var(--text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-right: auto; /* Pushes other items to the right */
+}
+
+/* --- NEW: Search Bar Styles --- */
+.search-bar-container {
+    position: relative;
+    flex-grow: 1; /* Allows it to take up available space */
+    max-width: 400px; /* Optional: set a max width */
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem; /* Left padding for icon space */
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* --- NEW: No Results Message --- */
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px dashed var(--border-color);
+    margin-top: 1rem;
+}
+
+.no-results h3 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* --- Responsive Design (Updated) --- */
+@media (max-width: 992px) {
+    .shopping-header {
+        flex-direction: column;
+        align-items: stretch; /* Make items take full width */
+    }
+
+    .shopping-header h1 {
+        margin-right: 0;
+        text-align: center;
+    }
+
+    .search-bar-container {
+        max-width: none; /* Remove max-width on smaller screens */
+        order: 2; /* Change order */
+    }
+
+    .add-order-btn {
+        order: 3;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Existing responsive rules */
+    /* ... */
+}
