@@ -54,23 +54,37 @@ const ManageChildren = () => {
             }
         }
     };
-    const handlePermissionChange=async(childId,field,value)=>{
-        try {
-            await axios.put(`http://localhost:4000/api/v1/admin/child/${childId}`,
-            { permissions:{[field]:value}},
-            {withCredentials:true});
 
-            setChildren(prev=>prev.map(child=>child._id===childId?
-                {...child,permissions:{...child.permissions,[field]:value}}
-                :child
-            ));
-              await fetchLoggedInUser();
 
-        } catch (error) {
-            alert('Failed to update permission.');
-            
-        }
-    }
+   const handlePermissionChange = async (childId, field, value) => {
+  try {
+    const targetChild = children.find(child => child._id === childId);
+    if (!targetChild) return;
+
+    const updatedPermissions = {
+      ...targetChild.permissions,
+      [field]: value
+    };
+
+    await axios.put(
+      `http://localhost:4000/api/v1/admin/child/${childId}`,
+      { permissions: updatedPermissions }, // ✅ Send full object
+      { withCredentials: true }
+    );
+
+    setChildren(prev =>
+      prev.map(child =>
+        child._id === childId
+          ? { ...child, permissions: updatedPermissions }
+          : child
+      )
+    );
+
+    // await fetchLoggedInUser();
+  } catch (error) {
+    alert('Failed to update permission.');
+  }
+};
 
 
 
