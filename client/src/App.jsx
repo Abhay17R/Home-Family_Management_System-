@@ -11,7 +11,7 @@ import Intro from "./pages/intro";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
 import UserProfile from "./pages/dashboard/Userprofile.jsx";
-import Communication from "./pages/dashboard/Communication.jsx";
+// import Communication from "./pages/dashboard/Communication.jsx";
 import ForgotPassword from "./pages/ForgotPassword";
 import ManageChildren from "./pages/dashboard/ManageChildren";
 import ResetPassword from "./pages/ResetPassword";
@@ -30,6 +30,7 @@ import ShoppingAndOrders from "./pages/dashboard/Shopping.jsx"
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CommunicationHub from "./pages/dashboard/Communication.jsx";
 
 // AppRoutes component routing aur navigation logic handle karega
 const AppRoutes = () => {
@@ -101,7 +102,7 @@ if (isLoading) {
           {/* Dashboard ke andar ke saare child routes */}
           <Route index element={<DashboardHome />} />
           <Route path="expenses" element={<HouseHoldExpense />} />
-          <Route path="communication" element={<Communication />} />
+          <Route path="communication" element={<CommunicationHub />} />
           <Route path="user-profile" element={<UserProfile />} />
           <Route path="orders" element={<ShoppingAndOrders />} />
           <Route path="emergency" element={<EmergencyAlertSystem />} />

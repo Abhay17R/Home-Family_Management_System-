@@ -1,163 +1,125 @@
 import React from 'react';
 import "../../styles/Dashboard/Communication.css"
 
-// Dummy Data - Asli app mein ye API se aayega
-const familyData = {
-  currentUser: 'u1',
-  users: {
-    'u1': { name: 'You', avatar: 'https://i.pravatar.cc/150?u=u1' },
-    'u2': { name: 'Priya', avatar: 'https://i.pravatar.cc/150?u=u2' },
-    'u3': { name: 'Rohan', avatar: 'https://i.pravatar.cc/150?u=u3' },
-    'u4': { name: 'Dad', avatar: 'https://i.pravatar.cc/150?u=u4' },
-  },
-  chats: [
-    { id: 'c1', type: 'group', name: '🏡 Family Group', avatar: 'https://static.vecteezy.com/system/resources/previews/000/628/192/original/vector-house-icon-symbol-sign.jpg', lastMessage: 'Rohan: Sounds good!', timestamp: '10:45 AM', unread: 2 },
-    { id: 'c2', type: 'private', name: 'Priya', avatar: 'https://i.pravatar.cc/150?u=u2', lastMessage: 'Okay, I will check.', timestamp: '9:30 AM', unread: 0 },
-    { id: 'c3', type: 'private', name: 'Dad', avatar: 'https://i.pravatar.cc/150?u=u4', lastMessage: 'Don\'t forget to pay the bill.', timestamp: 'Yesterday', unread: 1 },
-  ],
-  messages: {
-    'c1': [
-      { id: 'm1', userId: 'u4', text: 'Hey everyone, what\'s the plan for dinner tonight?', timestamp: '10:40 AM', reactions: { '👍': 1 } },
-      { id: 'm2', userId: 'u2', text: 'How about we order Pizza? 🍕', replyTo: 'm1', timestamp: '10:42 AM', reactions: { '❤️': 2 } },
-      { id: 'm3', userId: 'u3', text: '@Priya Sounds good!', timestamp: '10:45 AM', reactions: {} },
-      { id: 'poll1', type: 'poll', question: 'What to cook for dinner?', options: [{ text: 'Pizza', votes: 2 }, { text: 'Pasta', votes: 1 }, { text: 'Indian', votes: 1 }], totalVotes: 4 }
-    ],
-    'c2': [{ id: 'm4', userId: 'u2', text: 'Okay, I will check.', timestamp: '9:30 AM', reactions: {} }],
-    'c3': [{ id: 'm5', userId: 'u4', text: 'Don\'t forget to pay the bill.', timestamp: 'Yesterday', reactions: {} }],
-  },
-  activeChatDetails: {
-    id: 'c1',
-    pinned: [ {id: 'p1', text: 'WiFi Password: OurFamilyRocks!'}, {id: 'p2', text: 'Emergency Contact: 99XXXXXX00'} ],
-    media: [ 'https://images.unsplash.com/photo-1588315029705-be1451db68d8?w=100', 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=100', 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=100' ],
-    members: ['u1', 'u2', 'u3', 'u4']
-  }
+// Icons for better UI (You can use a library like react-icons)
+const PinIcon = () => '📌';
+const PollIcon = () => '📊';
+const MediaIcon = () => '🖼️';
+const MembersIcon = () => '👥';
+const SendIcon = () => '➤';
+const PaperclipIcon = () => '📎';
+
+// Dummy Data wahi use kar lete hain, bas presentation badal denge
+const hubData = {
+    // ... (same dummy data as before) ...
+    currentUser: 'u1',
+    users: { 'u1': { name: 'You', avatar: 'https://i.pravatar.cc/150?u=u1' }, 'u2': { name: 'Priya', avatar: 'https://i.pravatar.cc/150?u=u2' }, 'u3': { name: 'Rohan', avatar: 'https://i.pravatar.cc/150?u=u3' }, 'u4': { name: 'Dad', avatar: 'https://i.pravatar.cc/150?u=u4' }, },
+    chats: [ { id: 'c1', type: 'group', name: '🏡 Family Hangout', lastMessage: 'Rohan: Sounds good!', timestamp: '10:45 AM', unread: 2, avatar: 'https://cdn-icons-png.flaticon.com/512/2991/2991195.png' }, { id: 'c2', type: 'private', name: 'Priya', lastMessage: 'Okay, I will check.', timestamp: '9:30 AM', unread: 0, avatar: 'https://i.pravatar.cc/150?u=u2' }, { id: 'c3', type: 'private', name: 'Dad', lastMessage: 'Don\'t forget the bill.', timestamp: 'Yesterday', unread: 1, avatar: 'https://i.pravatar.cc/150?u=u4' } ],
+    messages: { 'c1': [ { id: 'm1', userId: 'u4', text: 'Hey everyone, what\'s the plan for dinner tonight?', timestamp: '10:40 AM', reactions: { '👍': 1 } }, { id: 'm2', userId: 'u2', text: 'How about we order Pizza? 🍕', replyTo: 'm1', timestamp: '10:42 AM', reactions: { '❤️': 2 } }, { id: 'm3', userId: 'u3', text: '@Priya Sounds good!', timestamp: '10:45 AM', reactions: {} } ], 'c2': [{ id: 'm4', userId: 'u2', text: 'Okay, I will check.', timestamp: '9:30 AM', reactions: {} }], 'c3': [{ id: 'm5', userId: 'u4', text: 'Don\'t forget the bill.', timestamp: 'Yesterday', reactions: {} }] },
+    activePoll: { question: 'Next holiday destination?', options: [{ text: 'Goa', votes: 2 }, { text: 'Manali', votes: 1 }], totalVotes: 3 },
+    pinnedNotes: [ {id: 'p1', text: 'WiFi Password: OurFamilyRocks!'}, {id: 'p2', text: 'Emergency Contact: 99XXXXXX00'} ],
+    recentMedia: [ 'https://images.unsplash.com/photo-1588315029705-be1451db68d8?w=100', 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=100', 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=100', 'https://images.unsplash.com/photo-1484723050470-7bf3384e54e2?w=100' ]
 };
 
-
-const Communication = () => {
+const CommunicationHub = () => {
   const [activeChatId, setActiveChatId] = React.useState('c1');
-  const activeChat = familyData.chats.find(c => c.id === activeChatId);
-  
-  return (
-    <div className="communication-container">
+  const activeChat = hubData.chats.find(c => c.id === activeChatId);
 
-      {/* -------------------- Left Panel: Chat List -------------------- */}
-      <div className="chat-list-panel">
-        <div className="panel-header">
-          <h2>Communication</h2>
-          <button className="new-chat-btn">+</button>
-        </div>
-        <div className="search-bar">
-          <input type="text" placeholder="Search or start a new chat" />
-        </div>
-        <div className="chat-list">
-          {familyData.chats.map(chat => (
-            <div key={chat.id} className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`} onClick={() => setActiveChatId(chat.id)}>
-              <img src={chat.avatar} alt={chat.name} className="avatar" />
-              <div className="chat-info">
-                <p className="chat-name">{chat.name}</p>
-                <p className="last-message">{chat.lastMessage}</p>
+  return (
+    <div className="hub-container">
+      <div className="hub-header">
+        <h1>Family Communication Hub</h1>
+        <button className="btn btn-primary">New Message</button>
+      </div>
+
+      <div className="hub-main-grid">
+        {/* ----------- Left Side: The Chat Interface ----------- */}
+        <div className="chat-section">
+          {/* List of chats */}
+          <div className="chat-selector-card">
+            {hubData.chats.map(chat => (
+              <div key={chat.id} className={`chat-selector-item ${chat.id === activeChatId ? 'active' : ''}`} onClick={() => setActiveChatId(chat.id)}>
+                <img src={chat.avatar} alt={chat.name} className="avatar" />
+                <div className="chat-selector-info">
+                  <p className="chat-name">{chat.name}</p>
+                  <p className="last-message">{chat.lastMessage}</p>
+                </div>
+                {chat.unread > 0 && <span className="unread-dot"></span>}
               </div>
-              <div className="chat-meta">
-                <p className="timestamp">{chat.timestamp}</p>
-                {chat.unread > 0 && <span className="unread-count">{chat.unread}</span>}
+            ))}
+          </div>
+
+          {/* Active chat window */}
+          <div className="active-chat-card">
+            <div className="active-chat-header">
+              <h3>{activeChat.name}</h3>
+              <div className="header-actions">
+                <span>🔔</span>
+                <div className="child-mode-indicator">🛡️ Child Mode: ON</div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* -------------------- Center Panel: Chat Window -------------------- */}
-      <div className="chat-window-panel">
-        <div className="panel-header chat-header">
-          <img src={activeChat.avatar} alt={activeChat.name} className="avatar" />
-          <div className="chat-info">
-            <p className="chat-name">{activeChat.name}</p>
-            <p className="chat-status">Priya, Rohan, Dad are online</p>
-          </div>
-          <div className="chat-actions">
-            <span>📞</span> <span>📹</span> <span>⚙️</span>
-          </div>
-        </div>
-        
-        <div className="message-area">
-          {familyData.messages[activeChatId].map(msg => {
-            if (msg.type === 'poll') {
-              return (
-                <div key={msg.id} className="message-bubble poll-bubble">
-                  <p className="poll-question">{msg.question}</p>
-                  {msg.options.map(opt => (
-                    <div key={opt.text} className="poll-option">
-                      <div className="poll-label">{opt.text} ({Math.round((opt.votes/msg.totalVotes)*100)}%)</div>
-                      <div className="poll-bar-bg"><div className="poll-bar-fg" style={{width: `${(opt.votes/msg.totalVotes)*100}%`}}></div></div>
+            <div className="messages-display">
+              {/* Messages will be mapped here */}
+              {hubData.messages[activeChatId].map(msg => {
+                const sender = hubData.users[msg.userId];
+                const isSentByMe = msg.userId === hubData.currentUser;
+                return (
+                  <div key={msg.id} className={`message-wrapper ${isSentByMe ? 'sent' : 'received'}`}>
+                    {!isSentByMe && <img src={sender.avatar} alt={sender.name} className="avatar-small" />}
+                    <div className="message-content">
+                      {!isSentByMe && <p className="sender-name">{sender.name}</p>}
+                      <p className="message-text">{msg.text}</p>
+                      <div className="message-meta">
+                        <span className="timestamp">{msg.timestamp}</span>
+                        {Object.keys(msg.reactions).length > 0 && <span className="reactions">❤️👍</span>}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              )
-            }
-            const sender = familyData.users[msg.userId];
-            const isSentByMe = msg.userId === familyData.currentUser;
-            return (
-              <div key={msg.id} className={`message-wrapper ${isSentByMe ? 'sent' : 'received'}`}>
-                {!isSentByMe && <img src={sender.avatar} alt={sender.name} className="avatar" />}
-                <div className="message-bubble">
-                  {!isSentByMe && <p className="sender-name">{sender.name}</p>}
-                  {msg.replyTo && <div className="reply-preview">Replying to "Hey everyone..."</div>}
-                  <p className="message-text">{msg.text}</p>
-                  <div className="reactions">
-                    {Object.entries(msg.reactions).map(([emoji, count]) => <span key={emoji}>{emoji} {count}</span>)}
                   </div>
-                  <p className="timestamp">{msg.timestamp}</p>
+                )
+              })}
+            </div>
+            <div className="message-input-box">
+              <button className="icon-btn"><PaperclipIcon /></button>
+              <input type="text" placeholder="Type a message..." />
+              <button className="send-btn"><SendIcon /></button>
+            </div>
+          </div>
+        </div>
+
+        {/* ----------- Right Side: The Info & Widgets Panel ----------- */}
+        <div className="info-section">
+          <div className="info-card">
+            <h4 className="card-title"><PollIcon /> Active Poll</h4>
+            <p className="poll-question">{hubData.activePoll.question}</p>
+            <div className="poll-options">
+              {hubData.activePoll.options.map(opt => (
+                <div key={opt.text} className="poll-result">
+                  <span>{opt.text}</span>
+                  <strong>{Math.round((opt.votes / hubData.activePoll.totalVotes) * 100)}%</strong>
                 </div>
-              </div>
-            )
-          })}
-        </div>
+              ))}
+            </div>
+            <button className="btn btn-secondary full-width">Vote Now</button>
+          </div>
 
-        <div className="message-input-area">
-          <button className="attach-btn">📎</button>
-          <input type="text" placeholder={`Message in ${activeChat.name}...`} />
-          <button className="emoji-btn">😀</button>
-          <button className="send-btn">➤</button>
-        </div>
-      </div>
-
-      {/* -------------------- Right Panel: Chat Details -------------------- */}
-      <div className="chat-details-panel">
-        <div className="details-section">
-          <h4>📌 Pinned Messages</h4>
-          <div className="pinned-list">
-            {familyData.activeChatDetails.pinned.map(pin => <div key={pin.id} className="pinned-item">{pin.text}</div>)}
+          <div className="info-card">
+            <h4 className="card-title"><PinIcon /> Pinned Notes</h4>
+            <ul className="pinned-list">
+              {hubData.pinnedNotes.map(note => <li key={note.id}>{note.text}</li>)}
+            </ul>
           </div>
-        </div>
-        <div className="details-section">
-          <h4>📊 Create a Poll</h4>
-          <div className="create-poll">
-            <input type="text" placeholder="Ask a question..." />
-            <button>Create</button>
+          
+          <div className="info-card">
+            <h4 className="card-title"><MediaIcon /> Recent Media</h4>
+            <div className="media-grid">
+              {hubData.recentMedia.map((src, i) => <img key={i} src={src} alt="media"/>)}
+            </div>
+             <a href="#" className="view-all-link">View All</a>
           </div>
-        </div>
-        <div className="details-section">
-          <h4>🖼️ Media Gallery</h4>
-          <div className="media-grid">
-            {familyData.activeChatDetails.media.map((src, i) => <img key={i} src={src} alt="media" />)}
-            <div className="view-all">+9 more</div>
-          </div>
-        </div>
-        <div className="details-section">
-          <h4>👥 Members</h4>
-          <div className="members-list">
-            {familyData.activeChatDetails.members.map(uid => <div key={uid}><img src={familyData.users[uid].avatar} className="avatar-small" /> {familyData.users[uid].name}</div>)}
-          </div>
-        </div>
-        <div className="details-section child-mode">
-            <h4>🛡️ Child Mode</h4>
-            <p>Safe chat is currently <strong>ON</strong> for Rohan.</p>
-            <a href="#">Manage Settings</a>
         </div>
       </div>
     </div>
   );
 };
 
-export default Communication;
+export default CommunicationHub;
