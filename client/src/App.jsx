@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import Intro from "./pages/intro";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
+import UserProfile from "./pages/dashboard/Userprofile.jsx";
 import ForgotPassword from "./pages/ForgotPassword";
 import ManageChildren from "./pages/dashboard/ManageChildren";
 import ResetPassword from "./pages/ResetPassword";
@@ -99,6 +100,7 @@ if (isLoading) {
           {/* Dashboard ke andar ke saare child routes */}
           <Route index element={<DashboardHome />} />
           <Route path="expenses" element={<HouseHoldExpense />} />
+          <Route path="user-profile" element={<UserProfile />} />
           <Route path="orders" element={<ShoppingAndOrders />} />
           <Route path="emergency" element={<EmergencyAlertSystem />} />
           <Route path="location" element={<LocationDashboard />} />

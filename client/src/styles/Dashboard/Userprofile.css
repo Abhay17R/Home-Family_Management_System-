@@ -1,0 +1,218 @@
+/* ---- Main Container & Header ---- */
+.profile-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.profile-header {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #2c3e50; /* Matches your sidebar's potential dark color */
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 1rem;
+}
+
+/* ---- Grid Layout for Cards ---- */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Left card is 1/3, right is 2/3 */
+  gap: 2rem;
+}
+
+/* ---- Generic Card Styling ---- */
+.profile-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease-in-out;
+}
+.profile-card:hover {
+    transform: translateY(-5px);
+}
+
+
+/* ---- Left Summary Card ---- */
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.avatar-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.avatar-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.change-avatar-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.change-avatar-btn::before {
+  content: '📷'; /* Camera emoji */
+}
+
+.user-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem 0;
+  color: #2c3e50;
+}
+
+.user-role {
+  font-size: 1rem;
+  color: #7f8c8d;
+  background-color: #ecf0f1;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-weight: 500;
+}
+
+.join-date {
+  margin-top: 1.5rem;
+  color: #95a5a6;
+  font-size: 0.9rem;
+}
+
+/* ---- Right Details Card & Form ---- */
+.details-card {
+  padding-top: 1.5rem;
+}
+
+.details-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.profile-form .form-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.profile-form .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+  flex: 1; /* Makes form groups in a row share space */
+}
+
+.profile-form label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.profile-form input,
+.profile-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f8f9fa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.profile-form input:focus,
+.profile-form textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.profile-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid #ecf0f1;
+  padding-top: 1.5rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+  background-color: #2980b9; /* A nice blue */
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #3498db;
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #555;
+}
+.btn-secondary:hover {
+  background-color: #d1d1d1;
+}
+
+/* ---- Responsive Design ---- */
+@media (max-width: 992px) {
+  .profile-grid {
+    grid-template-columns: 1fr; /* Stack cards on top of each other */
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1rem;
+  }
+  .profile-form .form-row {
+    flex-direction: column; /* Stack form fields in a row */
+    gap: 0;
+  }
+  .form-actions {
+    flex-direction: column;
+  }
+  .btn {
+    width: 100%;
+  }
+}
