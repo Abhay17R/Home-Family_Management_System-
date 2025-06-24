@@ -41,6 +41,7 @@ const Login = ({ setIsLogin }) => {
         await fetchLoggedInUser();
         // setUser(data.user);
       }
+      navigate('/dashboard');
       
     } catch (error) {
       // Error ko handle karein

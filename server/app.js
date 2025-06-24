@@ -15,7 +15,7 @@ export const app = express();
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL || "*"], // Agar FRONTEND_URL na ho to * laga do testing ke liye
+    origin: process.env.FRONTEND_URL, // Agar FRONTEND_URL na ho to * laga do testing ke liye
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // spelling fix
   })

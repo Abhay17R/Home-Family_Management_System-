@@ -350,6 +350,7 @@ export const verifyOTP = catchAsyncError(async (req, res, next) => {
 
 
 export const login = catchAsyncError(async (req, res, next) => {
+    console.log("Login request body:", req.body); 
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -368,7 +369,7 @@ export const login = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Password is incorrect", 400));
   }
 
-  const token=user.generateToken();
+  const token=await user.generateToken();
   //new session object
    const newSession = {
     token: token,
@@ -384,13 +385,23 @@ export const login = catchAsyncError(async (req, res, next) => {
   user.activeSessions.push(newSession);
   await user.save({ validateBeforeSave: false });
 
-    const options = {
-    expires: new Date(Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
-    httpOnly: true, // Prevents client-side JS from reading the cookie
-    // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    // sameSite: 'strict'
-  };
+        const options = {
+        // Cookie kab expire hogi (e.g., 15 din).
+        expires: new Date(
+            Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        // Isse cookie ko sirf server access kar sakta hai, frontend JavaScript nahi (Security).
+        httpOnly: true,
+
+        // YEH DO LINES SABSE ZAROORI HAIN
+        // Production (live website) par 'None' aur Development (localhost) par 'Lax' set hoga.
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+        // Production mein cookie sirf HTTPS par kaam karegi.
+        secure: process.env.NODE_ENV === "production",
+    };
+
   user.password = undefined;
+  console.log("Setting cookie now...")
 
  res.status(200).cookie("token", token, options).json({
     success: true,
