@@ -24,6 +24,7 @@ import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard.jsx";
 import EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
 import OtpChild from "./pages/dashboard/OtpChild";
+import ShoppingAndOrders from "./pages/dashboard/Shopping.jsx"
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -98,6 +99,7 @@ if (isLoading) {
           {/* Dashboard ke andar ke saare child routes */}
           <Route index element={<DashboardHome />} />
           <Route path="expenses" element={<HouseHoldExpense />} />
+          <Route path="orders" element={<ShoppingAndOrders />} />
           <Route path="emergency" element={<EmergencyAlertSystem />} />
           <Route path="location" element={<LocationDashboard />} />
           <Route path="reports" element={<AnalyticsDashboard />} />

@@ -1,0 +1,95 @@
+/* --- Global Variables for Easy Theming --- */
+:root {
+    --primary-bg: #f0f2f5; /* Light grey background for the page */
+    --card-bg: #ffffff; /* White background for cards */
+    --text-primary: #1c2733; /* Dark text for headings */
+    --text-secondary: #5a6b7b; /* Lighter text for details */
+    --accent-color: #4a90e2; /* A nice blue for buttons and accents */
+    --border-color: #e1e8ed;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+
+    --status-delivered: #28a745;
+    --status-shipped: #ffc107;
+    --status-pending: #dc3545;
+}
+
+/* --- Main Container, Header, Grid etc. (No Changes Here) --- */
+
+/* ... (pehle wala saara CSS yahan paste kar dein) ... */
+.shopping-container { padding: 2rem; max-width: 1200px; margin: auto; }
+.shopping-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.shopping-header h1 { color: var(--text-primary); font-size: 2rem; font-weight: 700; }
+.add-order-btn { background-color: var(--accent-color); color: white; border: none; border-radius: 8px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+.add-order-btn:hover { background-color: #357abd; transform: translateY(-2px); }
+.orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+
+/* --- Order Card --- */
+.order-card { background-color: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); padding: 1.5rem; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.order-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px var(--shadow-color); }
+
+/* --- CSS CHANGES START HERE --- */
+
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* NEW: Container for title and link icon */
+.store-title-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* Space between title and icon */
+}
+
+.order-card-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+/* NEW: Styling for the website link icon */
+.store-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 1.2rem; /* Icon size */
+    line-height: 1; /* Helps with alignment */
+    transition: all 0.2s ease-in-out;
+}
+
+.store-link:hover {
+    color: var(--accent-color);
+    transform: scale(1.15) rotate(5deg);
+}
+
+
+/* --- CSS CHANGES END HERE --- */
+
+
+/* ... (baki ka CSS yahan paste kar dein) ... */
+.order-status { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; padding: 0.25rem 0.6rem; border-radius: 12px; }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; }
+.status-delivered { color: var(--status-delivered); background-color: #eaf6ec; }
+.status-delivered .status-dot { background-color: var(--status-delivered); }
+.status-shipped { color: #c68c00; background-color: #fff8e1; }
+.status-shipped .status-dot { background-color: var(--status-shipped); }
+.status-pending { color: var(--status-pending); background-color: #fbe9ea; }
+.status-pending .status-dot { background-color: var(--status-pending); }
+.order-card-body { flex-grow: 1; }
+.order-detail { display: flex; align-items: center; gap: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+.order-detail i { color: var(--accent-color); width: 16px; text-align: center; }
+.order-detail span { font-size: 0.95rem; }
+.order-detail strong { color: var(--text-primary); font-weight: 600; }
+.order-card-footer { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; justify-content: flex-end; }
+.action-btn { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+.action-btn:hover { background-color: #f7f7f7; border-color: #cdd5de; }
+.action-btn.primary { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
+.action-btn.primary:hover { background-color: #357abd; border-color: #357abd; }
+.action-btn.danger { color: var(--status-pending); border-color: var(--status-pending); }
+.action-btn.danger:hover { background-color: var(--status-pending); color: white; }
+
+/* --- Responsive Design (No Changes Here) --- */
+@media (max-width: 768px) { .shopping-container { padding: 1rem; } .shopping-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .shopping-header h1 { font-size: 1.8rem; } .add-order-btn { width: 100%; justify-content: center; } .orders-grid { grid-template-columns: 1fr; } }
