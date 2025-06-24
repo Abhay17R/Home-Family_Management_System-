@@ -6,6 +6,7 @@ import { connection } from "./database/dbconnection.js";
 import { errorMiddleware } from "./middleware/error.js";
 import userRouter from "./routes/userRouter.js";
 import dashboardRoutes from './routes/dashboardRoutes.js'; 
+import settingsRoutes from './routes/settingsRoutes.js'
 config({ path: "./config.env" });
 
 export const app = express();
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/v1", userRouter);
+app.use('/api/v1/settings', settingsRoutes);
+
 
 connection();
 

@@ -368,8 +368,37 @@ export const login = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Password is incorrect", 400));
   }
 
-  // Send token and user info including role, familyId, parentId
-  sendToken(user, 200, "User logged in successfully.", res);
+  const token=user.generateToken();
+  //new session object
+   const newSession = {
+    token: token,
+    ipAddress: req.ip, // User ka IP address (e.g., '::1' for localhost)
+    deviceInfo: req.headers['user-agent'] // User ka browser/device info
+  };
+  // . Is naye session ko user ke activeSessions array mein daal do.
+  // Agar 'activeSessions' array nahi hai, to pehle use initialize karo.
+
+  if (!user.activeSessions) {
+    user.activeSessions = [];
+  }
+  user.activeSessions.push(newSession);
+  await user.save({ validateBeforeSave: false });
+
+    const options = {
+    expires: new Date(Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+    httpOnly: true, // Prevents client-side JS from reading the cookie
+    // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    // sameSite: 'strict'
+  };
+  user.password = undefined;
+
+ res.status(200).cookie("token", token, options).json({
+    success: true,
+    message: "User logged in successfully.",
+    user,
+    token, // Token ko JSON body mein bhi bhej sakte hain agar mobile app use karega
+  });
+
 });
 
 

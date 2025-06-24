@@ -3,7 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-
+const SessionSchema=new mongoose.Schema({
+  token:{type:String,required:true},
+  deviceInfo:{type:String,default:'Uknown Device'},
+  locationInfo:{type:String,default:'Uknown Location'},
+  ipAddress:{type:String},
+  lastActive:{type:Date,default:Date.now}
+});
 
 
 
@@ -51,6 +57,12 @@ const userSchema = new mongoose.Schema({
       return this.role === "admin" ? crypto.randomBytes(8).toString("hex") : null;
     },
   },
+  twoFactorAuth:{
+    secret:{type:String,default:''},
+    isEnabled:{type:Boolean,default:false},
+  },
+  activeSessions:[SessionSchema]
+  
   
 }, {
   timestamps: true
