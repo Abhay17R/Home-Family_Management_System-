@@ -1,5 +1,6 @@
 import Order from '../models/orderModel.js';
 import {catchAsyncError} from '../middleware/catchAsyncError.js';
+import {User} from '../models/userModel.js';
 
 
 //new orders
@@ -15,26 +16,57 @@ export const createOrder = catchAsyncError(async (req, res, next) => {
 });
 
 //get orders
-export const getAllOrders = catchAsyncError(async (req, res, next) => {
-    const { search } = req.query;
-    const queryFilter = { user: req.user.id }; // Sirf logged-in user ke orders
 
-    if (search) {
-        queryFilter.$or = [
-            { store: { $regex: search, $options: 'i' } },
-            { orderId: { $regex: search, $options: 'i' } },
-            { status: { $regex: search, $options: 'i' } },
-        ];
+// catchAsyncError ko import rehne dein, bas use mat karein
+
+// Humne 'catchAsyncError' wrapper ko hata diya hai
+export const getAllOrders = async (req, res, next) => {
+    try {
+        console.log("--- Starting Order Fetch (No Wrapper) ---");
+        const loggedInUser = req.user;
+        console.log("Logged-in user email:", loggedInUser.email);
+        const familyId = loggedInUser.familyId;
+        console.log("Found Family ID:", familyId);
+
+        if (!familyId) {
+            return res.status(400).json({ success: false, message: 'User is not part of any family.' });
+        }
+
+        // Is line se pehle aur baad mein console log lagayein
+        console.log("About to search for family members...");
+        const familyMembers = await User.find({ familyId: familyId }).select('_id');
+        console.log("Successfully found family members:", familyMembers);
+
+        if (!familyMembers || familyMembers.length === 0) {
+            console.log("No members found, returning empty list.");
+            return res.status(200).json({ success: true, count: 0, orders: [] });
+        }
+        
+        const familyMemberIds = familyMembers.map(member => member._id);
+        console.log("Family Member IDs array:", familyMemberIds);
+
+        const queryFilter = { user: { $in: familyMemberIds } };
+
+        const orders = await Order.find(queryFilter).sort({ orderDate: -1 });
+        console.log(`Found ${orders.length} orders.`);
+
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            orders,
+        });
+
+    } catch (error) {
+        // Asli error yahan pakda jaayega
+        console.error("!!! CRITICAL ERROR IN getAllOrders !!!:", error);
+        // Frontend ko ek saaf-suthra error message bhejenge
+        res.status(500).json({
+            success: false,
+            message: "An internal server error occurred.",
+            error: error.message // Development ke liye error message bhej sakte hain
+        });
     }
-
-    const orders = await Order.find(queryFilter).sort({ orderDate: -1 });
-
-    res.status(200).json({
-        success: true,
-        count: orders.length,
-        orders,
-    });
-});
+};
 
 //details of only on order
 export const getOrderDetails = catchAsyncError(async (req, res, next) => {

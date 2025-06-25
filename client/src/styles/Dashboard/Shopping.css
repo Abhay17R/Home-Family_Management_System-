@@ -1,75 +1,64 @@
-/* --- Global Variables for Easy Theming --- */
+/* --- Global Variables --- */
 :root {
-    --primary-bg: #f0f2f5; /* Light grey background for the page */
-    --card-bg: #ffffff; /* White background for cards */
-    --text-primary: #1c2733; /* Dark text for headings */
-    --text-secondary: #5a6b7b; /* Lighter text for details */
-    --accent-color: #4a90e2; /* A nice blue for buttons and accents */
+    --primary-bg: #f4f7fa;
+    --card-bg: #ffffff;
+    --text-primary: #1c2733;
+    --text-secondary: #5a6b7b;
+    --accent-color: #4a90e2;
     --border-color: #e1e8ed;
     --shadow-color: rgba(0, 0, 0, 0.08);
-
     --status-delivered: #28a745;
     --status-shipped: #ffc107;
     --status-pending: #dc3545;
+    --status-cancelled: #6c757d;
 }
 
-/* --- Main Container, Header, Grid etc. (No Changes Here) --- */
+/* --- Main Layout --- */
+.shopping-container {
+    padding: 2rem;
+    max-width: 1300px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 80px); /* Adjust 80px based on your top nav height */
+}
 
-/* ... (pehle wala saara CSS yahan paste kar dein) ... */
-.shopping-container { padding: 2rem; max-width: 1200px; margin: auto; }
-.shopping-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.shopping-header h1 { color: var(--text-primary); font-size: 2rem; font-weight: 700; }
-.add-order-btn { background-color: var(--accent-color); color: white; border: none; border-radius: 8px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
-.add-order-btn:hover { background-color: #357abd; transform: translateY(-2px); }
-.orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+.main-content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 5px; /* For scrollbar space */
+}
 
-/* --- Order Card --- */
-.order-card { background-color: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); padding: 1.5rem; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.order-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px var(--shadow-color); }
-
-/* --- CSS CHANGES START HERE --- */
-
-.order-card-header {
+/* --- Header & Search Bar --- */
+.shopping-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-}
-
-/* NEW: Container for title and link icon */
-.store-title-container {
-    display: flex;
     align-items: center;
-    gap: 0.75rem; /* Space between title and icon */
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+    flex-shrink: 0;
 }
-
-.order-card-header h3 {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 1.25rem;
+.shopping-header h1 {
+    font-size: 2rem;
+    margin-right: auto;
 }
+.search-bar-container { position: relative; flex-grow: 1; max-width: 400px; }
+.search-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: var(--text-secondary); }
+.search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 1rem; }
+.search-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); }
+.add-order-btn { background-color: var(--accent-color); color: white; border: none; border-radius: 8px; padding: 0.8rem 1.5rem; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
 
-/* NEW: Styling for the website link icon */
-.store-link {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 1.2rem; /* Icon size */
-    line-height: 1; /* Helps with alignment */
-    transition: all 0.2s ease-in-out;
-}
+/* --- Orders Section --- */
+.orders-section { margin-bottom: 3rem; }
+.orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
+.order-card { background-color: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); padding: 1.5rem; display: flex; flex-direction: column; }
+.order-card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
+.order-card-header h3 { margin: 0; font-size: 1.25rem; }
+.order-card-body { flex-grow: 1; }
+.order-detail { display: flex; align-items: center; gap: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+.order-detail strong { color: var(--text-primary); }
 
-.store-link:hover {
-    color: var(--accent-color);
-    transform: scale(1.15) rotate(5deg);
-}
-
-
-/* --- CSS CHANGES END HERE --- */
-
-
-/* ... (baki ka CSS yahan paste kar dein) ... */
+/* Status Styles */
 .order-status { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; padding: 0.25rem 0.6rem; border-radius: 12px; }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; }
 .status-delivered { color: var(--status-delivered); background-color: #eaf6ec; }
@@ -78,213 +67,42 @@
 .status-shipped .status-dot { background-color: var(--status-shipped); }
 .status-pending { color: var(--status-pending); background-color: #fbe9ea; }
 .status-pending .status-dot { background-color: var(--status-pending); }
-.order-card-body { flex-grow: 1; }
-.order-detail { display: flex; align-items: center; gap: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
-.order-detail i { color: var(--accent-color); width: 16px; text-align: center; }
-.order-detail span { font-size: 0.95rem; }
-.order-detail strong { color: var(--text-primary); font-weight: 600; }
-.order-card-footer { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; justify-content: flex-end; }
-.action-btn { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
-.action-btn:hover { background-color: #f7f7f7; border-color: #cdd5de; }
-.action-btn.primary { background-color: var(--accent-color); border-color: var(--accent-color); color: white; }
-.action-btn.primary:hover { background-color: #357abd; border-color: #357abd; }
+.status-cancelled { color: var(--status-cancelled); background-color: #f8f9fa; }
+.status-cancelled .status-dot { background-color: var(--status-cancelled); }
+
+/* --- Card Footer & Buttons --- */
+.order-card-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; }
+.action-btn { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
 .action-btn.danger { color: var(--status-pending); border-color: var(--status-pending); }
 .action-btn.danger:hover { background-color: var(--status-pending); color: white; }
+.action-btn.icon-btn { border: none; color: var(--text-secondary); font-size: 1.1rem; padding: 5px; }
+.action-btn.icon-btn:hover { color: var(--accent-color); }
+.action-btn.delete-btn:hover { color: var(--status-pending); }
 
-/* --- Responsive Design (No Changes Here) --- */
-@media (max-width: 768px) { .shopping-container { padding: 1rem; } .shopping-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .shopping-header h1 { font-size: 1.8rem; } .add-order-btn { width: 100%; justify-content: center; } .orders-grid { grid-template-columns: 1fr; } }/* Purani saari CSS jaisi hai waisi hi rakhein */
-/* ... (your existing CSS) ... */
+/* --- Shopping Websites Section --- */
+.shopping-websites-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+.shopping-websites-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 2rem; }
+.websites-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.website-card { background-color: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); overflow: hidden; }
+.website-card a { text-decoration: none; color: inherit; }
+.website-card-header { display: flex; align-items: center; gap: 15px; padding: 20px 20px 10px 20px; }
+.website-card-header h3 { margin: 0; font-size: 1.4rem; }
+.website-emoji { font-size: 2rem; }
+.website-url { font-size: 0.9rem; color: var(--accent-color); padding: 0 20px; }
+.website-card-body { padding: 10px 20px 20px 20px; }
+.website-description, .website-feature { font-size: 0.95rem; color: #555; margin: 10px 0; }
+.website-feature::before { content: '⭐'; margin-right: 8px; }
 
-/* --- Header Section (Updated for search bar) --- */
-.shopping-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    gap: 1.5rem; /* Add gap between items */
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-}
+/* --- Modal --- */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: #fff; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; }
+.modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; }
+.modal-content form { display: flex; flex-direction: column; gap: 1rem; }
+.modal-content form input, .modal-content form select { padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+.modal-actions button { padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.modal-actions button.primary { background-color: var(--accent-color); color: white; }
 
-.shopping-header h1 {
-    color: var(--text-primary);
-    font-size: 2rem;
-    font-weight: 700;
-    margin-right: auto; /* Pushes other items to the right */
-}
-
-/* --- NEW: Search Bar Styles --- */
-.search-bar-container {
-    position: relative;
-    flex-grow: 1; /* Allows it to take up available space */
-    max-width: 400px; /* Optional: set a max width */
-}
-
-.search-icon {
-    position: absolute;
-    top: 50%;
-    left: 15px;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.8rem 1rem 0.8rem 2.5rem; /* Left padding for icon space */
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    font-size: 1rem;
-    color: var(--text-primary);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-}
-
-/* --- NEW: No Results Message --- */
-.no-results {
-    text-align: center;
-    padding: 4rem 2rem;
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    border: 1px dashed var(--border-color);
-    margin-top: 1rem;
-}
-
-.no-results h3 {
-    color: var(--text-primary);
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.no-results p {
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
-
-/* --- Responsive Design (Updated) --- */
-@media (max-width: 992px) {
-    .shopping-header {
-        flex-direction: column;
-        align-items: stretch; /* Make items take full width */
-    }
-
-    .shopping-header h1 {
-        margin-right: 0;
-        text-align: center;
-    }
-
-    .search-bar-container {
-        max-width: none; /* Remove max-width on smaller screens */
-        order: 2; /* Change order */
-    }
-
-    .add-order-btn {
-        order: 3;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 768px) {
-    /* Existing responsive rules */
-    /* ... */
-}
-/* ===== New CSS for Shopping Websites Section ===== */
-
-/* Section container */
-.shopping-websites-section {
-    margin-top: 40px; /* Orders section se doori */
-    padding-top: 30px;
-    border-top: 1px solid #e0e0e0; /* Ek halki si line */
-}
-
-/* Section heading */
-.shopping-websites-section h2 {
-    text-align: center;
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-/* Grid layout for website cards */
-.websites-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px; /* Cards ke beech mein space */
-}
-
-/* Individual website card */
-.website-card {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.website-card:hover {
-    transform: translateY(-5px); /* Hover par halka sa upar uthega */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-}
-
-/* Link area of the card */
-.website-card-link {
-    text-decoration: none;
-    color: inherit;
-    padding: 20px;
-    display: block;
-}
-
-/* Card header with emoji and name */
-.website-card-header {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Emoji aur name ke beech mein space */
-    margin-bottom: 8px;
-}
-
-.website-card-header h3 {
-    margin: 0;
-    font-size: 1.4rem;
-    color: #1a1a1a;
-}
-
-.website-emoji {
-    font-size: 2rem;
-    line-height: 1;
-}
-
-/* Website URL style */
-.website-url {
-    font-size: 0.9rem;
-    color: #007bff; /* Link jaisa color */
-    margin: 0;
-    font-weight: 500;
-}
-
-/* Card body with description and feature */
-.website-card-body {
-    padding: 0 20px 20px 20px;
-    border-top: 1px solid #f0f0f0;
-    margin-top: 15px;
-    flex-grow: 1; /* Body ko available space lene dega */
-}
-
-.website-description,
-.website-feature {
-    font-size: 0.95rem;
-    color: #555;
-    line-height: 1.5;
-    margin: 10px 0;
-}
-
-/* Feature text ke pehle ek icon */
-.website-feature::before {
-    content: '⭐'; /* Aap '✓' ya koi aur emoji bhi use kar sakte hain */
-    margin-right: 8px;
-    font-size: 0.9rem;
-}
+/* --- Loading/Error States --- */
+.loading-state, .error-state, .no-results { text-align: center; padding: 4rem 2rem; background-color: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color); }
+.error-state { color: var(--status-pending); background-color: #fbe9ea; }
