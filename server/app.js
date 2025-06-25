@@ -7,6 +7,7 @@ import { errorMiddleware } from "./middleware/error.js";
 import userRouter from "./routes/userRouter.js";
 import dashboardRoutes from './routes/dashboardRoutes.js'; 
 import settingsRoutes from './routes/settingsRoutes.js'
+import orderRoutes from './routes/orderRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 config({ path: "./config.env" });
 
@@ -30,6 +31,7 @@ app.use("/api/dashboard", dashboardRoutes);
   app.use("/api/v1", userRouter);
   app.use('/api/v1/settings', settingsRoutes);
   app.use('/api/v1/', expenseRoutes);
+  app.use('/api/v1/orders', orderRoutes);
 
 
 connection();
