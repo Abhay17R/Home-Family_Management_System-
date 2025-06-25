@@ -27,9 +27,9 @@ app.use(express.json()); // parentheses important hain
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/dashboard", dashboardRoutes);
 
-app.use("/api/v1", userRouter);
-app.use('/api/v1/settings', settingsRoutes);
-app.use('/api/v1/expenses', expenseRoutes);
+  app.use("/api/v1", userRouter);
+  app.use('/api/v1/settings', settingsRoutes);
+  app.use('/api/v1/', expenseRoutes);
 
 
 connection();

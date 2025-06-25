@@ -5,11 +5,10 @@ import ErrorHandler from '../middleware/error.js';
 // Create New Expense
 export const addExpense = catchAsyncError(async (req, res, next) => {
     const { description, amount, category, date } = req.body;
-    
-    // Logged-in user ki ID ko 'paidBy' field mein daalein
     const paidBy = req.user.id; 
 
-    const expense = await Expense.create({
+    // Step 1: Naya expense create aur save karein
+    const newExpense = await Expense.create({
         description,
         amount,
         category,
@@ -17,9 +16,14 @@ export const addExpense = catchAsyncError(async (req, res, next) => {
         paidBy,
     });
 
+    // Step 2: Naye banaye gaye expense ko populate karein
+    // Hum usi document par .populate() call kar sakte hain
+    const populatedExpense = await newExpense.populate('paidBy', 'name');
+
+    // Step 3: Populated data ko frontend par bhejein
     res.status(201).json({
         success: true,
-        expense,
+        expense: populatedExpense, // <-- Ab isme 'paidBy' ka naam bhi hoga!
     });
 });
 

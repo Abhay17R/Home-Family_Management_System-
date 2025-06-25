@@ -1,35 +1,49 @@
 // HouseholdExpenses.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // useEffect ko import karein
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Sector } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import '../../styles/Dashboard/expenses.css';
-
-// Sample data - Asal app mein yeh API se aayega
-const initialExpenses = [
-    { id: 1, date: '2023-10-25', description: 'Groceries from BigBasket', category: 'Food', amount: 3200, paidBy: 'Rohan' },
-    { id: 2, date: '2023-10-24', description: 'Electricity Bill', category: 'Utilities', amount: 1500, paidBy: 'Priya' },
-    { id: 3, date: '2023-10-23', description: 'Petrol for Car', category: 'Transport', amount: 1000, paidBy: 'Rohan' },
-    { id: 4, date: '2023-10-22', description: 'Movie Tickets', category: 'Entertainment', amount: 850, paidBy: 'Priya' },
-    { id: 5, date: '2023-10-22', description: 'Kids School Fees', category: 'Education', amount: 7500, paidBy: 'Rohan' },
-    { id: 6, date: '2023-10-20', description: 'Swiggy Dinner', category: 'Food', amount: 600, paidBy: 'Priya' },
-];
+import api from '../../api/axios'; // NEW: Aapka banaya hua API client import karein
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1943'];
 
 const HouseholdExpenses = () => {
-    const [expenses, setExpenses] = useState(initialExpenses);
+    // === STATE MANAGEMENT ===
+    const [expenses, setExpenses] = useState([]); // Initial state ab ek empty array hai
+    const [loading, setLoading] = useState(true);   // NEW: Loading state
+    const [error, setError] = useState(null);        // NEW: Error state
     const [formState, setFormState] = useState({
         description: '',
         category: 'Food',
         amount: '',
         date: new Date().toISOString().slice(0, 10),
-        paidBy: 'Rohan'
+        // 'paidBy' ab yahan zaroori nahi, backend handle karega
     });
 
-    // Calculate total expenses for the summary card
-    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    // === DATA FETCHING (useEffect) ===
+    useEffect(() => {
+        const fetchExpenses = async () => {
+            try {
+                setLoading(true);
+                // GET request bhejkar saare expenses fetch karein
+                const response = await api.get('/expenses');
+                // Backend se `response.data.expenses` mein data aa raha hai
+                setExpenses(response.data.expenses);
+                setError(null);
+            } catch (err) {
+                setError(err.response?.data?.message || 'Failed to fetch data.');
+                console.error("Fetch Error:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    // Prepare data for the pie chart (spending by category)
+        fetchExpenses();
+    }, []); // Empty dependency array [] ka matlab yeh sirf ek baar chalega
+
+    // === DATA PROCESSING FOR CHARTS ===
+    // Yeh logic ab dynamic 'expenses' state par apne aap kaam karega
+    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     const categoryData = expenses.reduce((acc, expense) => {
         const existingCategory = acc.find(item => item.name === expense.category);
         if (existingCategory) {
@@ -39,8 +53,6 @@ const HouseholdExpenses = () => {
         }
         return acc;
     }, []);
-    
-    // Prepare data for bar chart (spending over time)
     const dailySpending = expenses.reduce((acc, expense) => {
         const date = new Date(expense.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
         const existingDate = acc.find(item => item.date === date);
@@ -53,34 +65,60 @@ const HouseholdExpenses = () => {
     }, []).sort((a,b) => new Date(a.date) - new Date(b.date));
 
 
+    // === EVENT HANDLERS ===
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormState(prevState => ({ ...prevState, [name]: value }));
     };
 
-    const handleAddExpense = (e) => {
+    const handleAddExpense = async (e) => {
         e.preventDefault();
         if (!formState.description || !formState.amount) {
             alert('Please fill out description and amount.');
             return;
         }
-        const newExpense = {
-            id: Date.now(),
-            ...formState,
-            amount: parseFloat(formState.amount)
-        };
-        setExpenses([newExpense, ...expenses]);
-        // Reset form
-        setFormState({
-            description: '', category: 'Food', amount: '', 
-            date: new Date().toISOString().slice(0, 10), paidBy: 'Rohan'
-        });
+        
+        try {
+            // POST request bhejkar naya expense add karein
+            const response = await api.post('/expenses', {
+                ...formState,
+                amount: parseFloat(formState.amount)
+            });
+            // State ko update karein, naya expense list mein sabse upar dikhega
+            setExpenses([response.data.expense, ...expenses]);
+            // Form ko reset karein
+            setFormState({
+                description: '', category: 'Food', amount: '', 
+                date: new Date().toISOString().slice(0, 10)
+            });
+        } catch (err) {
+            alert(err.response?.data?.message || 'Could not add expense.');
+            console.error("Add Expense Error:", err);
+        }
     };
     
-    const handleDelete = (id) => {
-        setExpenses(expenses.filter(exp => exp.id !== id));
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this transaction?")) return;
+
+        try {
+            // DELETE request bhejkar expense ko uski ID se delete karein
+            await api.delete(`/expense/${id}`);
+            // State se us expense ko filter karke hata dein
+            setExpenses(expenses.filter(exp => exp._id !== id));
+        } catch (err) {
+            alert(err.response?.data?.message || 'Could not delete expense.');
+            console.error("Delete Error:", err);
+        }
     };
 
+    // === RENDER LOGIC ===
+    if (loading) {
+        return <div className="expenses-container"><h1>Loading your expenses...</h1></div>;
+    }
+
+    if (error) {
+        return <div className="expenses-container"><h1>Error: {error}</h1></div>;
+    }
 
     return (
         <div className="expenses-container">
@@ -113,7 +151,7 @@ const HouseholdExpenses = () => {
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
-                            <Tooltip />
+                            <Tooltip formatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
                             <Legend />
                         </PieChart>
                     </ResponsiveContainer>
@@ -125,9 +163,9 @@ const HouseholdExpenses = () => {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="date" />
                             <YAxis />
-                            <Tooltip />
+                            <Tooltip formatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
                             <Legend />
-                            <Bar dataKey="amount" fill="#82ca9d" />
+                            <Bar dataKey="amount" fill="#82ca9d" name="Spending" />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -149,10 +187,7 @@ const HouseholdExpenses = () => {
                             <option>Health</option>
                             <option>Other</option>
                         </select>
-                        <select name="paidBy" value={formState.paidBy} onChange={handleInputChange}>
-                            <option>Rohan</option>
-                            <option>Priya</option>
-                        </select>
+                        {/* 'Paid By' dropdown hata diya gaya hai */}
                         <input type="date" name="date" value={formState.date} onChange={handleInputChange} required />
                         <button type="submit">Add Expense</button>
                     </form>
@@ -172,13 +207,18 @@ const HouseholdExpenses = () => {
                         </thead>
                         <tbody>
                             {expenses.map(expense => (
-                                <tr key={expense.id}>
+                                // CHANGE: Key ab MongoDB ka `_id` hoga
+                                <tr key={expense._id}> 
                                     <td>{new Date(expense.date).toLocaleDateString('en-IN')}</td>
                                     <td>{expense.description}</td>
                                     <td><span className={`category-badge ${expense.category.toLowerCase()}`}>{expense.category}</span></td>
                                     <td>₹{expense.amount.toLocaleString('en-IN')}</td>
-                                    <td>{expense.paidBy}</td>
-                                    <td><button className="delete-btn" onClick={() => handleDelete(expense.id)}>Delete</button></td>
+                                    {/* CHANGE: 'paidBy' ab ek object hai, jismein 'name' hai */}
+                                    <td>{expense.paidBy?.name || '...'}</td> 
+                                    <td>
+                                        {/* CHANGE: handleDelete ko ab `_id` pass hoga */}
+                                        <button className="delete-btn" onClick={() => handleDelete(expense._id)}>Delete</button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
