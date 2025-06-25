@@ -47,7 +47,7 @@ const AppRoutes = () => {
         if (user) {
             // Agar user login ho gaya hai aur woh public page par hai,
             // to use dashboard par bhej do.
-            const publicPaths = ['/auth', '/login', '/intro', '/'];
+            const publicPaths = ['/auth', '/login', '/'];
             if (publicPaths.includes(window.location.pathname)) {
                 navigate('/dashboard', { replace: true });
             }
@@ -80,7 +80,7 @@ if (isLoading) {
         {/* Agar user login hai, to in routes se usko dashboard bhej do */}
         <Route path="/" element={!user ? <Intro /> : <Navigate to="/dashboard" replace />} />
         <Route path="/about" element={<About />} />
-        <Route path="/intro" element={!user ? <Intro /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/intro" element={<Intro />} />
         <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
         <Route path="/otp-verification/:email/:phone" element={<OtpVerification />} />
         <Route path="/password/forgot" element={<ForgotPassword />} />
