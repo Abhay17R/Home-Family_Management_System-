@@ -191,3 +191,100 @@
     /* Existing responsive rules */
     /* ... */
 }
+/* ===== New CSS for Shopping Websites Section ===== */
+
+/* Section container */
+.shopping-websites-section {
+    margin-top: 40px; /* Orders section se doori */
+    padding-top: 30px;
+    border-top: 1px solid #e0e0e0; /* Ek halki si line */
+}
+
+/* Section heading */
+.shopping-websites-section h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Grid layout for website cards */
+.websites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px; /* Cards ke beech mein space */
+}
+
+/* Individual website card */
+.website-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.website-card:hover {
+    transform: translateY(-5px); /* Hover par halka sa upar uthega */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Link area of the card */
+.website-card-link {
+    text-decoration: none;
+    color: inherit;
+    padding: 20px;
+    display: block;
+}
+
+/* Card header with emoji and name */
+.website-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Emoji aur name ke beech mein space */
+    margin-bottom: 8px;
+}
+
+.website-card-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #1a1a1a;
+}
+
+.website-emoji {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+/* Website URL style */
+.website-url {
+    font-size: 0.9rem;
+    color: #007bff; /* Link jaisa color */
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Card body with description and feature */
+.website-card-body {
+    padding: 0 20px 20px 20px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 15px;
+    flex-grow: 1; /* Body ko available space lene dega */
+}
+
+.website-description,
+.website-feature {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+/* Feature text ke pehle ek icon */
+.website-feature::before {
+    content: '⭐'; /* Aap '✓' ya koi aur emoji bhi use kar sakte hain */
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
