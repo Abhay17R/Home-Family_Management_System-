@@ -9,8 +9,8 @@ import { useAuth } from '../hooks/useAuth.js';  // ✅ STEP 1: Apne AuthContext 
 const menuItems = [
     { heading: 'General' },
     { name: 'Dashboard / Home', path: '/dashboard', role: ['admin', 'child'] },
-    { name: 'User Profile', path: '/dashboard/user-profile', role: ['admin'] },
-    { name: 'My Profile', path: '/dashboard/child-profile', role: ['child'] },
+    { name: 'My Profile', path: '/dashboard/user-profile', role: ['admin','child'] },
+    // { name: 'My Profile', path: '/dashboard/child-profile', role: ['child'] },  
     { name: 'Documents', path: '/dashboard/documents', role: ['admin', 'child'] },
     
     { heading: 'Finance & Planning' },
