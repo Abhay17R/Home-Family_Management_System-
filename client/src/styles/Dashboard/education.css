@@ -1,0 +1,216 @@
+/* EducationDashboard.css */
+
+.education-container {
+  padding: 2rem 3rem;
+  background-color: #f8f9fa; /* Light grey background to contrast with cards */
+  height: 100%;
+  overflow-y: auto;
+}
+
+.education-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.education-header h1 {
+  font-size: 2.5rem;
+  color: #212529;
+  font-weight: 700;
+}
+
+.add-student-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-student-btn:hover {
+  background-color: #0056b3;
+}
+
+.student-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2rem;
+}
+
+.student-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #343a40;
+}
+
+.card-header p {
+  margin: 0.25rem 0 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.student-grade {
+  background-color: #e7f3ff;
+  color: #007bff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.card-section {
+  margin-bottom: 1.5rem;
+}
+
+.card-section h4 {
+  font-size: 1.1rem;
+  color: #495057;
+  margin-bottom: 1rem;
+}
+
+.card-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-section li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f3f5;
+  font-size: 0.95rem;
+}
+
+.card-section li:last-child {
+  border-bottom: none;
+}
+
+.due-date {
+  color: #dc3545;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.add-btn-small {
+    background: none;
+    border: 1px dashed #007bff;
+    color: #007bff;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+.add-btn-small:hover {
+    background-color: #e7f3ff;
+    color: #0056b3;
+}
+
+
+.grades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.grade-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.subject {
+  color: #495057;
+  font-weight: 500;
+}
+
+.grade-badge {
+  color: white;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Different colors for different grades */
+.grade-Aplus, .grade-A { background-color: #28a745; }
+.grade-Bplus, .grade-B { background-color: #ffc107; color: #212529;}
+.grade-C { background-color: #fd7e14; }
+.grade-D { background-color: #dc3545; }
+
+.fee-status {
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fee-status.paid {
+  background-color: #d4edda;
+  border-left: 5px solid #28a745;
+  color: #155724;
+}
+
+.fee-status.due {
+  background-color: #f8d7da;
+  border-left: 5px solid #dc3545;
+  color: #721c24;
+}
+
+.fee-status p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pay-now-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pay-now-btn:hover {
+  background-color: #c82333;
+}

@@ -22,6 +22,7 @@ import HouseHoldExpense from "./pages/dashboard/Expenses.jsx";
 import SecuritySettings from "./pages/dashboard/Settings.jsx";
 import LocationDashboard from "./pages/dashboard/Location.jsx";
 import FileManager from "./pages/dashboard/document.jsx";
+import EducationDashboard from "./pages/dashboard/Education.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard.jsx";
 import EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
@@ -102,6 +103,7 @@ if (isLoading) {
           {/* Dashboard ke andar ke saare child routes */}
           <Route index element={<DashboardHome />} />
           <Route path="expenses" element={<HouseHoldExpense />} />
+          <Route path="education" element={<EducationDashboard />} />
           <Route path="communication" element={<CommunicationHub />} />
           <Route path="user-profile" element={<UserProfile />} />
           <Route path="orders" element={<ShoppingAndOrders />} />
