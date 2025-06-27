@@ -1,39 +1,97 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { format } from 'date-fns';
+import API from '../../api/axios';
 import '../../styles/Dashboard/emergency.css';
 
-// Simple Alert Icon (from a library like react-icons or custom SVG)
+// SVG Icon Component
 const AlertTriangleIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
 );
 
 function EmergencyAlertSystem() {
-    const [isAlertActive, setIsAlertActive] = useState(false);
+    // States
+    const [activeAlert, setActiveAlert] = useState(null);
     const [isHolding, setIsHolding] = useState(false);
     const [holdProgress, setHoldProgress] = useState(0);
+    const [alertHistory, setAlertHistory] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null); // Logged-in user ka data store karne ke liye
+    const [error, setError] = useState('');
 
+    // Refs
     const holdTimerRef = useRef(null);
     const progressIntervalRef = useRef(null);
     const audioRef = useRef(null);
+    const socketRef = useRef(null);
 
-    // Dummy data for alert history
-    const [alertHistory, setAlertHistory] = useState([
-        { id: 1, user: 'Priya', date: '2023-10-25 08:15 PM', status: 'Resolved' },
-        { id: 2, user: 'Aarav', date: '2023-10-22 11:30 AM', status: 'Resolved' },
-    ]);
-
-    // Preload the audio
+    // Effect 1: Fetch initial data (User & History) and setup audio
     useEffect(() => {
-        audioRef.current = new Audio('/path/to/siren-alert.mp3'); // IMPORTANT: Replace with your actual sound file path
+        // Preload audio
+        audioRef.current = new Audio('/audio/emergency-siren.mp3'); // Ensure this path is correct
         audioRef.current.preload = 'auto';
+
+        // Fetch current user's data
+        const fetchCurrentUser = async () => {
+            try {
+                const { data } = await API.get('/me');
+                setCurrentUser(data.user);
+            } catch (err) {
+                console.error("Could not fetch user data", err);
+            }
+        };
+
+        // Fetch initial alert history
+        const fetchHistory = async () => {
+            try {
+                const { data } = await API.get('/emergency/history');
+                setAlertHistory(data.alerts);
+                const currentlyActive = data.alerts.find(a => a.status === 'Active');
+                if (currentlyActive) {
+                    setActiveAlert(currentlyActive);
+                    playAlertSound();
+                }
+            } catch (err) {
+                setError('Could not load alert history.');
+            }
+        };
+
+        fetchCurrentUser();
+        fetchHistory();
+    }, []);
+    
+    // Effect 2: Setup Socket.IO connection and event listeners
+    useEffect(() => {
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        if (!token) return;
+
+        socketRef.current = io('http://localhost:4000', { auth: { token } });
+
+        socketRef.current.on('connect', () => console.log('Connected to Socket.IO'));
+
+        socketRef.current.on('new-alert', (newAlertData) => {
+            setAlertHistory(prev => [newAlertData, ...prev]);
+            setActiveAlert(newAlertData);
+            playAlertSound();
+        });
+
+        socketRef.current.on('alert-resolved', ({ alertId }) => {
+            setActiveAlert(null);
+            stopAlertSound();
+            setAlertHistory(prev => 
+                prev.map(alert => alert._id === alertId ? { ...alert, status: 'Resolved' } : alert)
+            );
+        });
+
+        return () => { if (socketRef.current) socketRef.current.disconnect(); };
     }, []);
 
+    // Audio helper functions
     const playAlertSound = () => {
         if (audioRef.current) {
             audioRef.current.loop = true;
             audioRef.current.play().catch(error => console.error("Audio play failed:", error));
         }
     };
-
     const stopAlertSound = () => {
         if (audioRef.current) {
             audioRef.current.pause();
@@ -41,103 +99,97 @@ function EmergencyAlertSystem() {
         }
     };
 
+    // SOS Trigger Logic
     const triggerSOS = () => {
-        console.log("--- TRIGGERING SOS ---");
-        setIsAlertActive(true);
-        playAlertSound();
-
-        // --- SIMULATE API CALL TO BACKEND ---
-        // In a real app, you would make a fetch/axios call here
-        // fetch('/api/emergency/trigger-sos', { method: 'POST', ... });
-        console.log("API call to trigger SMS via Twilio would be made here.");
-
-        // Add to history
-        const newAlert = {
-            id: Date.now(),
-            user: 'You',
-            date: new Date().toLocaleString(),
-            status: 'Active'
-        };
-        setAlertHistory(prev => [newAlert, ...prev]);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                try {
+                    await API.post('/emergency/trigger', {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
+                } catch (err) {
+                    setError(err.response?.data?.message || 'Failed to trigger alert.');
+                }
+            },
+            () => setError('Could not get your location. Please grant permission.'),
+            { enableHighAccuracy: true }
+        );
     };
 
+    // Button hold logic
     const handleMouseDown = () => {
         setIsHolding(true);
         setHoldProgress(0);
-
-        // Start the progress interval
-        progressIntervalRef.current = setInterval(() => {
-            setHoldProgress(prev => prev + 1);
-        }, 20); // 100 * 20ms = 2000ms = 2 seconds
-
-        // Set a timer to trigger SOS after 2 seconds
+        progressIntervalRef.current = setInterval(() => setHoldProgress(prev => prev + 1), 20);
         holdTimerRef.current = setTimeout(() => {
             clearInterval(progressIntervalRef.current);
             triggerSOS();
         }, 2000);
     };
-
     const cancelHold = () => {
         setIsHolding(false);
         clearTimeout(holdTimerRef.current);
         clearInterval(progressIntervalRef.current);
         setHoldProgress(0);
     };
+    const handleMouseUp = () => cancelHold();
+    const handleMouseLeave = () => { if (isHolding) cancelHold(); };
 
-    const handleMouseUp = () => {
-        cancelHold();
-    };
-
-    const handleMouseLeave = () => {
-        if (isHolding) {
-            cancelHold();
+    // Cancel Alert Logic
+    const handleCancelAlert = async () => {
+        stopAlertSound();
+        try {
+            await API.post('/emergency/resolve');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to cancel alert.');
         }
     };
-    
-    const handleCancelAlert = () => {
-        setIsAlertActive(false);
-        stopAlertSound();
-        // Update the status in history
-        setAlertHistory(prev => 
-            prev.map(alert => alert.status === 'Active' ? { ...alert, status: 'Resolved' } : alert)
-        );
-        console.log("--- ALERT CANCELLED ---");
-        // You might also want to send an "I'm safe" API call here
-    };
 
-    if (isAlertActive) {
+    // --- JSX RENDERING ---
+
+    // View when an alert is active
+    if (activeAlert) {
         return (
             <div className="emergency-container alert-active-bg">
                 <div className="alert-active-content">
-                    <div className="pulsing-icon">
-                        <AlertTriangleIcon />
-                    </div>
+                    <div className="pulsing-icon"><AlertTriangleIcon /></div>
                     <h1>ALERT ACTIVE</h1>
-                    <p>Your emergency contacts have been notified via SMS and your location has been shared.</p>
-                    <button className="cancel-alert-button" onClick={handleCancelAlert}>
-                        I'm Safe (Cancel Alert)
-                    </button>
+                    <p>
+                        <b>{activeAlert.triggeredBy.name}</b> needs help! Emergency contacts have been notified.
+                    </p>
+                    
+                    {/* ============================================================== */}
+                    {/* ===== YEH HAI CORRECT LOGIC - AB KOI PLACEHOLDER NAHI ===== */}
+                    {/* ============================================================== */}
+                    {currentUser && activeAlert.triggeredBy._id === currentUser._id && (
+                         <button className="cancel-alert-button" onClick={handleCancelAlert}>
+                            I'm Safe (Cancel Alert)
+                        </button>
+                    )}
+                    {/* ============================================================== */}
+                    
                 </div>
             </div>
         );
     }
 
+    // Default view
     return (
         <div className="emergency-container">
             <div className="emergency-header">
                 <h1>Emergency Alert System</h1>
                 <p>In case of an emergency, press and hold the SOS button for 2 seconds.</p>
+                {error && <p className="error-message">{error}</p>}
             </div>
 
             <div className="sos-button-container">
                 <button
                     className="sos-button"
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseLeave}
-                    onTouchStart={handleMouseDown} // For mobile
-                    onTouchEnd={handleMouseUp}     // For mobile
+                    onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}
+                    onTouchStart={handleMouseDown} onTouchEnd={handleMouseUp}
                     style={{ '--progress': `${holdProgress}%` }}
+                    disabled={!currentUser} // Disable button if user data isn't loaded yet
                 >
                     <div className="sos-button-content">
                         <AlertTriangleIcon />
@@ -153,10 +205,10 @@ function EmergencyAlertSystem() {
                 <h3>Alert History</h3>
                 <ul className="alert-history-list">
                     {alertHistory.length > 0 ? alertHistory.map(alert => (
-                        <li key={alert.id} className="history-item">
+                        <li key={alert._id} className="history-item">
                             <div className="history-details">
-                                <span className="history-user">{alert.user} triggered an alert.</span>
-                                <span className="history-date">{alert.date}</span>
+                                <span className="history-user">{alert.triggeredBy.name} triggered an alert.</span>
+                                <span className="history-date">{format(new Date(alert.createdAt), 'PPpp')}</span>
                             </div>
                             <span className={`history-status status-${alert.status.toLowerCase()}`}>
                                 {alert.status}
