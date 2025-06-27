@@ -11,6 +11,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import educationRoutes from'./routes/educationRoutes.js';
 import locationRouter from './routes/locationRoutes.js';
+import emergencyRouter from './routes/emergencyRoutes.js';
 config({ path: "./config.env" });
 
 export const app = express();
@@ -34,6 +35,7 @@ app.use("/api/dashboard", dashboardRoutes);
   app.use('/api/v1/settings', settingsRoutes);
   app.use('/api/v1/', expenseRoutes);
   app.use('/api/v1/orders', orderRoutes);
+  app.use('/api/v1/emergency', emergencyRouter);
    app.use('/api/v1/education', educationRoutes);
    app.use('/api/v1/location', locationRouter);
 

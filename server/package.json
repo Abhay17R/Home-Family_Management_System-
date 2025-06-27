@@ -20,6 +20,7 @@
     "mongoose": "^8.16.0",
     "nodemailer": "^7.0.3",
     "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1",
     "speakeasy": "^2.0.0",
     "twilio": "^5.7.1"
   }
