@@ -1,232 +1,230 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { io } from 'socket.io-client';
-import { format } from 'date-fns';
-import API from '../../api/axios'; // Aapka custom Axios instance
-import '../../styles/Dashboard/emergency.css';
+    import React, { useState, useRef, useEffect } from 'react';
+    import { io } from 'socket.io-client';
+    import { format } from 'date-fns';
+    import API from '../../api/axios'; // Aapka custom Axios instance
+    import '../../styles/Dashboard/emergency.css';
 
-// SVG Icon Component for the SOS button
-const AlertTriangleIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-);
+    // SVG Icon Component for the SOS button
+    const AlertTriangleIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+    );
 
+    function EmergencyAlertSystem() {
+        // === STATES ===
+        const [activeAlert, setActiveAlert] = useState(null);
+        const [isHolding, setIsHolding] = useState(false);
+        const [holdProgress, setHoldProgress] = useState(0);
+        const [alertHistory, setAlertHistory] = useState([]);
+        const [currentUser, setCurrentUser] = useState(null);
+        const [error, setError] = useState('');
+        const [isCancelling, setIsCancelling] = useState(false); // For the "I'm Safe" button loading state
 
-function EmergencyAlertSystem() {
-    // === STATES ===
-    const [activeAlert, setActiveAlert] = useState(null);
-    const [isHolding, setIsHolding] = useState(false);
-    const [holdProgress, setHoldProgress] = useState(0);
+        // === REFS ===
+        const holdTimerRef = useRef(null);
+        const progressIntervalRef = useRef(null);
+        const audioRef = useRef(new Audio('/audio/emergency-siren.mp3'));  // Preload audio on component mount
+        const socketRef = useRef(null);
 
-    const [alertHistory, setAlertHistory] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [error, setError] = useState('');
-    const [isCancelling, setIsCancelling] = useState(false); // For the "I'm Safe" button loading state
+        // === EFFECT 1: Runs once on component mount to fetch initial data and set up audio ===
+        useEffect(() => {
+            audioRef.current.preload = 'auto';  // Ensure audio is preloaded
 
-    // === REFS ===
-    const holdTimerRef = useRef(null);
-    const progressIntervalRef = useRef(null);
-    const audioRef = useRef(null);
-    const socketRef = useRef(null);
-
-    // === EFFECT 1: Runs once on component mount to fetch initial data and set up audio ===
-    useEffect(() => {
-        // 1. Preload the audio file
-        audioRef.current = new Audio('/audio/emergency-siren.mp3'); // IMPORTANT: Make sure this path is correct in your `public` folder
-        audioRef.current.preload = 'auto';
-
-        // 2. Fetch the currently logged-in user's data
-        const fetchCurrentUser = async () => {
-            try {
-                const { data } = await API.get('/me');
-                setCurrentUser(data.user);
-            } catch (err) {
-                console.error("Could not fetch user data", err);
-                setError("Could not verify your identity. Please refresh.");
-            }
-        };
-
-        // 3. Fetch the family's alert history
-        const fetchHistory = async () => {
-            try {
-                const { data } = await API.get('/emergency/history');
-                setAlertHistory(data.alerts);
-                const currentlyActive = data.alerts.find(a => a.status === 'Active');
-                if (currentlyActive) {
-                    setActiveAlert(currentlyActive);
-                    playAlertSound();
-                }
-            } catch (err) {
-                setError('Could not load alert history.');
-            }
-        };
-
-        fetchCurrentUser();
-        fetchHistory();
-    }, []);
-    
-    // === EFFECT 2: Sets up and tears down the real-time Socket.IO connection ===
-    useEffect(() => {
-        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-        if (!token) return;
-
-        socketRef.current = io('http://localhost:4000', { auth: { token } });
-
-        socketRef.current.on('connect', () => console.log('Socket.IO connection established.'));
-
-        socketRef.current.on('new-alert', (newAlertData) => {
-            setAlertHistory(prev => [newAlertData, ...prev]);
-            setActiveAlert(newAlertData);
-            playAlertSound();
-        });
-
-        socketRef.current.on('alert-resolved', ({ alertId }) => {
-            setActiveAlert(null);
-            stopAlertSound();
-            setAlertHistory(prev => 
-                prev.map(alert => alert._id === alertId ? { ...alert, status: 'Resolved' } : alert)
-            );
-        });
-
-        return () => { if (socketRef.current) socketRef.current.disconnect(); };
-    }, []);
-
-    // === HELPER FUNCTIONS ===
-    const playAlertSound = () => {
-        if (audioRef.current) {
-            audioRef.current.loop = true;
-            audioRef.current.play().catch(error => console.error("Audio play failed:", error));
-        }
-    };
-    const stopAlertSound = () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-        }
-    };
-
-    // === CORE LOGIC FUNCTIONS ===
-    const triggerSOS = () => {
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                setError('');
+            // Fetch current user
+            const fetchCurrentUser = async () => {
                 try {
-                    await API.post('/emergency/trigger', { lat: position.coords.latitude, lng: position.coords.longitude });
-                    window.location.reload();   
+                    const { data } = await API.get('/me');
+                    setCurrentUser(data.user);
                 } catch (err) {
-                    setError(err.response?.data?.message || 'Failed to trigger alert.');
+                    console.error("Could not fetch user data", err);
+                    setError("Could not verify your identity. Please refresh.");
                 }
-            },
-            () => setError('Could not get your location. Please grant permission.'),
-            { enableHighAccuracy: true }
-        );
-    };
+            };
 
-    const handleMouseDown = () => {
-        if (activeAlert) return;
-        setIsHolding(true);
-        setHoldProgress(0);
-        progressIntervalRef.current = setInterval(() => setHoldProgress(prev => prev + 1), 20);
-        holdTimerRef.current = setTimeout(() => {
+            // Fetch alert history
+            const fetchHistory = async () => {
+                try {
+                    const { data } = await API.get('/emergency/history');
+                    setAlertHistory(data.alerts);
+                    const currentlyActive = data.alerts.find(a => a.status === 'Active');
+                    if (currentlyActive) {
+                        setActiveAlert(currentlyActive);
+                        playAlertSound();  // Play sound if an alert is already active
+                    }
+                } catch (err) {
+                    setError('Could not load alert history.');
+                }
+            };
+
+            fetchCurrentUser();
+            fetchHistory();
+        }, []);
+
+        // === EFFECT 2: Sets up and tears down the real-time Socket.IO connection ===
+        useEffect(() => {
+            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+            if (!token) return;
+
+            socketRef.current = io('http://localhost:4000', { auth: { token } });
+
+            socketRef.current.on('connect', () => console.log('Socket.IO connection established.'));
+
+            socketRef.current.on('new-alert', (newAlertData) => {
+                setAlertHistory(prev => [newAlertData, ...prev]);
+                setActiveAlert(newAlertData);
+                playAlertSound();
+            });
+
+            socketRef.current.on('alert-resolved', ({ alertId }) => {
+                setActiveAlert(null);
+                stopAlertSound();
+                setAlertHistory(prev => 
+                    prev.map(alert => alert._id === alertId ? { ...alert, status: 'Resolved' } : alert)
+                );
+            });
+
+            return () => { if (socketRef.current) socketRef.current.disconnect(); };
+        }, []);
+
+        // === HELPER FUNCTIONS ===
+        const playAlertSound = () => {
+            if (audioRef.current) {
+                audioRef.current.loop = true;
+                audioRef.current.play().catch(error => {
+                    console.error("Audio play failed:", error);
+                });
+            }
+        };
+
+        const stopAlertSound = () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+        };
+
+        // === CORE LOGIC FUNCTIONS ===
+        const triggerSOS = async () => {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    setError('');
+                    try {
+                        await API.post('/emergency/trigger', { lat: position.coords.latitude, lng: position.coords.longitude });
+                        window.location.reload();  // Refresh the page after alert is triggered
+                        playAlertSound();
+                    } catch (err) {
+                        setError(err.response?.data?.message || 'Failed to trigger alert.');
+                    }
+                },
+                () => setError('Could not get your location. Please grant permission.'),
+                { enableHighAccuracy: true }
+            );
+        };
+
+        const handleMouseDown = () => {
+            if (activeAlert) return;
+            setIsHolding(true);
+            setHoldProgress(0);
+            progressIntervalRef.current = setInterval(() => setHoldProgress(prev => prev + 1), 20);
+            holdTimerRef.current = setTimeout(() => {
+                clearInterval(progressIntervalRef.current);
+                triggerSOS();
+            }, 2000);
+        };
+
+        const cancelHold = () => {
+            setIsHolding(false);
+            clearTimeout(holdTimerRef.current);
             clearInterval(progressIntervalRef.current);
-            triggerSOS();
-        }, 2000);
-    };
-    const cancelHold = () => {
-        setIsHolding(false);
-        clearTimeout(holdTimerRef.current);
-        clearInterval(progressIntervalRef.current);
-        setHoldProgress(0);
-    };
-    const handleMouseUp = () => cancelHold();
-    const handleMouseLeave = () => { if (isHolding) cancelHold(); };
+            setHoldProgress(0);
+        };
 
-    const handleCancelAlert = async () => {
-        setIsCancelling(true); // Start loading
-        stopAlertSound();
-        try {
-            await API.post('/emergency/resolve');
-            // UI update will happen via the 'alert-resolved' socket event
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to cancel alert.');
-        } finally {
-            // No need to set isCancelling to false here, because the whole component will change.
-            // But it's good practice for other scenarios.
-            setIsCancelling(false);
-            window.location.reload();
+        const handleMouseUp = () => cancelHold();
+        const handleMouseLeave = () => { if (isHolding) cancelHold(); };
+
+        const handleCancelAlert = async () => {
+            setIsCancelling(true); // Start loading
+            stopAlertSound();
+            try {
+                await API.post('/emergency/resolve');
+                // UI update will happen via the 'alert-resolved' socket event
+            } catch (err) {
+                setError(err.response?.data?.message || 'Failed to cancel alert.');
+            } finally {
+                setIsCancelling(false);
+                window.location.reload();  // Refresh the page after cancel
+            }
+        };
+
+        // === JSX RENDERING ===
+
+        if (activeAlert) {
+            return (
+                <div className="emergency-container alert-active-bg">
+                    <div className="alert-active-content">
+                        <div className="pulsing-icon"><AlertTriangleIcon /></div>
+                        <h1>ALERT ACTIVE</h1>
+                        <p><b>{activeAlert.triggeredBy.name}</b> needs help! Emergency contacts have been notified.</p>
+                        
+                        {currentUser && activeAlert.triggeredBy._id === currentUser._id && (
+                            <button 
+                                className="cancel-alert-button" 
+                                onClick={handleCancelAlert}
+                                disabled={isCancelling}
+                            >
+                                {isCancelling ? 'Cancelling...' : "I'm Safe (Cancel Alert)"}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
         }
-    };
 
-    // === JSX RENDERING ===
-
-    // View 1: When an alert is currently active
-    if (activeAlert) {
         return (
-            <div className="emergency-container alert-active-bg">
-                <div className="alert-active-content">
-                    <div className="pulsing-icon"><AlertTriangleIcon /></div>
-                    <h1>ALERT ACTIVE</h1>
-                    <p><b>{activeAlert.triggeredBy.name}</b> needs help! Emergency contacts have been notified.</p>
-                    
-                    {currentUser && activeAlert.triggeredBy._id === currentUser._id && (
-                         <button 
-                            className="cancel-alert-button" 
-                            onClick={handleCancelAlert}
-                            disabled={isCancelling}
-                         >
-                            {isCancelling ? 'Cancelling...' : "I'm Safe (Cancel Alert)"}
-                        </button>
-                    )}
+            <div className="emergency-container">
+                <div className="emergency-header">
+                    <h1>Emergency Alert System</h1>
+                    <p>In case of an emergency, press and hold the SOS button for 2 seconds.</p>
+                    {error && <p className="error-message">{error}</p>}
+                </div>
+
+                <div className="sos-button-container">
+                    <button
+                        className="sos-button"
+                        onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}
+                        onTouchStart={handleMouseDown} onTouchEnd={handleMouseUp}
+                        style={{ '--progress': `${holdProgress}%` }}
+                        disabled={!currentUser || !!activeAlert}
+                    >
+                        <div className="sos-button-content">
+                            <AlertTriangleIcon />
+                            <span>SOS</span>
+                        </div>
+                    </button>
+                    <div className="sos-instructions">
+                        {isHolding ? 'Keep Holding...' : 'Press & Hold to Send Alert'}
+                    </div>
+                </div>
+
+                <div className="alert-history-card">
+                    <h3>Alert History</h3>
+                    <ul className="alert-history-list">
+                        {alertHistory.length > 0 ? alertHistory.map(alert => (
+                            <li key={alert._id} className="history-item">
+                                <div className="history-details">
+                                    <span className="history-user">{alert.triggeredBy.name} triggered an alert.</span>
+                                    <span className="history-date">{format(new Date(alert.createdAt), 'PPpp')}</span>
+                                </div>
+                                <span className={`history-status status-${alert.status.toLowerCase()}`}>
+                                    {alert.status}
+                                </span>
+                            </li>
+                        )) : (
+                        <li className="no-history">No past alerts found.</li>
+                        )}
+                    </ul>
                 </div>
             </div>
         );
     }
 
-    // View 2: The default screen
-    return (
-        <div className="emergency-container">
-            <div className="emergency-header">
-                <h1>Emergency Alert System</h1>
-                <p>In case of an emergency, press and hold the SOS button for 2 seconds.</p>
-                {error && <p className="error-message">{error}</p>}
-            </div>
-
-            <div className="sos-button-container">
-                <button
-                    className="sos-button"
-                    onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave}
-                    onTouchStart={handleMouseDown} onTouchEnd={handleMouseUp}
-                    style={{ '--progress': `${holdProgress}%` }}
-                    disabled={!currentUser || !!activeAlert}
-                >
-                    <div className="sos-button-content">
-                        <AlertTriangleIcon />
-                        <span>SOS</span>
-                    </div>
-                </button>
-                <div className="sos-instructions">
-                    {isHolding ? 'Keep Holding...' : 'Press & Hold to Send Alert'}
-                </div>
-            </div>
-
-            <div className="alert-history-card">
-                <h3>Alert History</h3>
-                <ul className="alert-history-list">
-                    {alertHistory.length > 0 ? alertHistory.map(alert => (
-                        <li key={alert._id} className="history-item">
-                            <div className="history-details">
-                                <span className="history-user">{alert.triggeredBy.name} triggered an alert.</span>
-                                <span className="history-date">{format(new Date(alert.createdAt), 'PPpp')}</span>
-                            </div>
-                            <span className={`history-status status-${alert.status.toLowerCase()}`}>
-                                {alert.status}
-                            </span>
-                        </li>
-                    )) : (
-                       <li className="no-history">No past alerts found.</li>
-                    )}
-                </ul>
-            </div>
-        </div>
-    );
-}
-
-export default EmergencyAlertSystem;
+    export default EmergencyAlertSystem;

@@ -65,7 +65,7 @@ export const triggerAlert = catchAsyncError(async (req, res, next) => {
     res.status(201).json({
         success: true,
         message: 'Alert triggered! Emergency contacts have been notified.',
-        alert: newAlert,
+        alert: populatedAlert,
     });
 });
 
