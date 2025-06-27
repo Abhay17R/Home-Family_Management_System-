@@ -36,6 +36,17 @@ const userSchema = new mongoose.Schema({
   verificationCodeExpire: Date,
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+   location: {
+        lat: { type: Number },
+        lng: { type: Number },
+    },
+    lastUpdated: {
+        type: Date,
+    },
+    isSharing: {
+        type: Boolean,
+        default: true,
+    },
 
   // Admin-Child system fields
   role: {
