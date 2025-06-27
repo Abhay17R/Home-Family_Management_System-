@@ -9,6 +9,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js'
 import orderRoutes from './routes/orderRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
+import educationRoutes from'./routes/educationRoutes.js';
 config({ path: "./config.env" });
 
 export const app = express();
@@ -32,7 +33,7 @@ app.use("/api/dashboard", dashboardRoutes);
   app.use('/api/v1/settings', settingsRoutes);
   app.use('/api/v1/', expenseRoutes);
   app.use('/api/v1/orders', orderRoutes);
-
+   app.use('/api/v1/education', educationRoutes);
 
 connection();
 
