@@ -186,3 +186,45 @@ input:checked + .slider:before {
         height: 50vh;
     }
 }
+/* ... (Aapka existing CSS) ... */
+
+/* NAYA: Selected member ko highlight karne ke liye */
+.member-item.selected {
+  background-color: #eaf4ff; /* halka neela color */
+  border-left: 4px solid #007bff;
+  transition: background-color 0.3s ease;
+}
+
+/* NAYA: Member Details Panel ka style */
+.member-details-panel {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+.member-details-panel h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr; /* Label aur Value ke liye columns */
+  gap: 10px;
+  font-size: 14px;
+}
+
+.details-grid p {
+  margin: 0;
+}
+
+.details-grid p:nth-child(odd) { /* Saare labels ko bold karega */
+  font-weight: 600;
+  color: #555;
+}   
