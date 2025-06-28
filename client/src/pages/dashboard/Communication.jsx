@@ -1,184 +1,215 @@
-import React, { useState } from 'react';
-// import './CommunicationHub.css'; // CSS file ko import karenge
-import '../../styles/Dashboard/Communication.css'
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import API from '../../api/axios';
+import { io } from 'socket.io-client';
+import '../../styles/Dashboard/Communication.css';
 
-// --- Icons (aap react-icons use kar sakte hain) ---
+// --- Icons ---
 const PinIcon = () => '📌';
 const PollIcon = () => '📊';
-const MediaIcon = () => '🖼️';
 const SendIcon = () => '➤';
 const PaperclipIcon = () => '📎';
 const BellIcon = () => '🔔';
 const ShieldIcon = () => '🛡️';
-const ClockIcon = () => '🕒'; // For scheduled messages
 
-// --- Comprehensive Dummy Data to power all features ---
-const hubData = {
-    currentUser: 'u1',
-    users: {
-        'u1': { name: 'You', avatar: 'https://i.pravatar.cc/150?u=u1' },
-        'u2': { name: 'Priya', avatar: 'https://i.pravatar.cc/150?u=u2' },
-        'u3': { name: 'Rohan', avatar: 'https://i.pravatar.cc/150?u=u3' },
-        'u4': { name: 'Dad', avatar: 'https://i.pravatar.cc/150?u=u4' },
-    },
-    chats: [
-        { id: 'c1', type: 'group', name: '🏡 Family Hangout', lastMessage: 'Rohan: Sounds good!', timestamp: '10:45 AM', unread: 2, avatar: 'https://cdn-icons-png.flaticon.com/512/2991/2991195.png' },
-        { id: 'c2', type: 'private', name: 'Priya', lastMessage: 'Okay, I will check.', timestamp: '9:30 AM', unread: 0, avatar: 'https://i.pravatar.cc/150?u=u2' },
-        { id: 'c3', type: 'private', name: 'Dad', lastMessage: 'Don\'t forget the bill.', timestamp: 'Yesterday', unread: 1, avatar: 'https://i.pravatar.cc/150?u=u4' }
-    ],
-    messages: {
-        'c1': [
-            { id: 'm1', userId: 'u4', text: 'Hey everyone, what\'s the plan for dinner tonight?', timestamp: '10:40 AM', reactions: { '❤️': 1 } },
-            { id: 'm2', userId: 'u2', text: 'How about we order Pizza? 🍕', replyTo: 'm1', timestamp: '10:42 AM', reactions: { '❤️': 2, '👍': 1 } },
-            { id: 'm3', userId: 'u3', text: '@Priya Sounds good!', timestamp: '10:45 AM', reactions: {} }
-        ],
-        'c2': [{ id: 'm4', userId: 'u2', text: 'Okay, I will check.', timestamp: '9:30 AM', reactions: {} }],
-        'c3': [{ id: 'm5', userId: 'u4', text: 'Don\'t forget the bill.', timestamp: 'Yesterday', reactions: {} }]
-    },
-    activePoll: { question: 'Next holiday destination?', options: [{ text: 'Goa', votes: 2 }, { text: 'Manali', votes: 1 }], totalVotes: 3 },
-    pinnedNotes: [ {id: 'p1', text: 'WiFi Password: OurFamilyRocks!'}, {id: 'p2', text: 'Emergency Contact: 99XXXXXX00'} ],
-    recentMedia: [ 'https://images.unsplash.com/photo-1588315029705-be1451db68d8?w=100', 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=100', 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=100', 'https://images.unsplash.com/photo-1484723050470-7bf3384e54e2?w=100' ]
+const getAuthToken = () => {
+    const cookies = document.cookie.split('; ');
+    const tokenCookie = cookies.find(row => row.startsWith('token='));
+    return tokenCookie ? tokenCookie.split('=')[1] : null;
 };
 
 const CommunicationHub = () => {
-    // --- States to manage the component's interactivity ---
-    const [activeChatId, setActiveChatId] = useState('c1');
+    // --- State Management ---
+    const [currentUser, setCurrentUser] = useState(null);
+    const [chats, setChats] = useState([]);
+    const [messages, setMessages] = useState({});
+    const [polls, setPolls] = useState([]); // Global polls
+    const [activeChatId, setActiveChatId] = useState(null);
+    const [loading, setLoading] = useState({ initial: true, messages: false });
+    const [error, setError] = useState(null);
+    const [messageInput, setMessageInput] = useState('');
     const [isCreatingPoll, setIsCreatingPoll] = useState(false);
     const [pollQuestion, setPollQuestion] = useState('');
     const [pollOptions, setPollOptions] = useState(['', '']);
-    const [messageInput, setMessageInput] = useState('');
+    
+    // --- Refs and Derived State ---
+    const messagesEndRef = useRef(null);
+    const activeChat = chats.find(c => c._id === activeChatId);
+    const activeMessages = messages[activeChatId] || [];
 
-    const activeChat = hubData.chats.find(c => c.id === activeChatId);
+    // --- Data Fetching ---
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            setLoading({ initial: true, messages: false });
+            try {
+                const [userRes, chatsRes, pollsRes] = await Promise.all([
+                    API.get('/me'),
+                    API.get('/communication/chats'),
+                    API.get('/communication/polls')
+                ]);
+                setCurrentUser(userRes.data.user);
+                setChats(chatsRes.data.chats);
+                setPolls(pollsRes.data.polls || []);
+                if (chatsRes.data.chats.length > 0) {
+                    const groupChat = chatsRes.data.chats.find(c => c.isGroupChat);
+                    setActiveChatId(groupChat ? groupChat._id : chatsRes.data.chats[0]._id);
+                }
+            } catch (err) {
+                setError("Could not load your hub. Please try again.");
+            } finally {
+                setLoading({ initial: false, messages: false });
+            }
+        };
+        fetchInitialData();
+    }, []);
 
-    // --- Poll Handler Functions ---
-    const handleOptionChange = (index, value) => {
-        const newOptions = [...pollOptions];
-        newOptions[index] = value;
-        setPollOptions(newOptions);
-    };
-    const addPollOption = () => setPollOptions([...pollOptions, '']);
-    const removePollOption = (index) => {
-        if (pollOptions.length <= 2) return;
-        setPollOptions(pollOptions.filter((_, i) => i !== index));
-    };
-    const handleCreatePoll = (e) => {
+    const fetchChatMessages = useCallback(async (chatId) => {
+        if (!chatId || String(chatId).startsWith('virtual-')) {
+            setMessages(prev => ({ ...prev, [chatId]: [] }));
+            return;
+        }
+        setLoading(prev => ({ ...prev, messages: true }));
+        try {
+            const res = await API.get(`/communication/messages/${chatId}`);
+            setMessages(prev => ({ ...prev, [chatId]: res.data.messages }));
+        } catch (err) {
+            console.error("Failed to fetch messages for", chatId);
+        } finally {
+            setLoading(prev => ({ ...prev, messages: false }));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (activeChatId) fetchChatMessages(activeChatId);
+    }, [activeChatId, fetchChatMessages]);
+
+    // --- Socket.IO Setup ---
+    useEffect(() => {
+        if (!currentUser) return;
+        const token = getAuthToken();
+        if (!token) return;
+
+        const socket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000', { auth: { token } });
+
+        socket.on('virtual_chat_created', ({ virtualId, newChat }) => {
+            setChats(prev => prev.map(c => (c._id === virtualId ? newChat : c)));
+            setActiveChatId(newChat._id);
+        });
+
+        socket.on('new_message', (newMessage) => {
+            const chatId = newMessage.chat._id;
+            setMessages(prev => ({ ...prev, [chatId]: [...(prev[chatId] || []), newMessage] }));
+            setChats(prev => prev.map(c => c._id === chatId ? { ...c, latestMessage: newMessage, updatedAt: newMessage.createdAt } : c)
+                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
+        });
+
+        socket.on('new_poll', (newPoll) => setPolls(prev => [newPoll, ...prev]));
+        socket.on('poll_updated', (updatedPoll) => {
+            setPolls(prevPolls => prevPolls.map(p => p._id === updatedPoll._id ? updatedPoll : p));
+        });
+
+        return () => socket.disconnect();
+    }, [currentUser]);
+
+    // --- Scroll and Action Handlers ---
+    useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [activeMessages]);
+
+    const handleSendMessage = async (e) => {
         e.preventDefault();
-        console.log("Launching Poll:", { question: pollQuestion, options: pollOptions });
-        setIsCreatingPoll(false);
-        setPollQuestion('');
-        setPollOptions(['', '']);
+        if (!messageInput.trim() || !activeChatId) return;
+        const currentActiveChat = chats.find(c => c._id === activeChatId);
+        const requestBody = { content: messageInput, chatId: activeChatId };
+        if (currentActiveChat?.isVirtual) {
+            const recipient = currentActiveChat.users.find(u => u._id !== currentUser?._id);
+            if (recipient) requestBody.recipientId = recipient._id;
+            else return;
+        }
+        try { await API.post('/communication/messages', requestBody); setMessageInput(''); }
+        catch (err) { alert("Failed to send message."); }
     };
+    
+    const handleCreatePoll = async (e) => {
+        e.preventDefault();
+        const filteredOptions = pollOptions.filter(opt => opt.trim() !== '');
+        if (!pollQuestion.trim() || filteredOptions.length < 2) return alert("Question and at least 2 options required.");
+        const pollData = { question: pollQuestion, options: filteredOptions };
+        try {
+            await API.post('/communication/polls', pollData);
+            setIsCreatingPoll(false); setPollQuestion(''); setPollOptions(['', '']);
+        } catch (err) { alert(err.response?.data?.message || "Failed to create poll."); }
+    };
+    
+    const handleVote = async (pollId, optionId) => {
+        try { 
+            // UI update ab socket se hoga
+            await API.post(`/communication/polls/vote/${pollId}`, { optionId });
+        } catch (err) { 
+            alert(err.response?.data?.message || "Failed to vote.");
+        }
+    };
+
+    const handleOptionChange = (index, value) => { setPollOptions(p => { const n = [...p]; n[index] = value; return n; }); };
+    const addPollOption = () => setPollOptions(p => [...p, '']);
+    const removePollOption = (index) => { if (pollOptions.length > 2) setPollOptions(p => p.filter((_, i) => i !== index)); };
+    
+    // --- Render Logic ---
+    if (loading.initial) return <div className="hub-container loading-container"><h1>Loading Your Hub...</h1></div>;
+    if (error) return <div className="hub-container error-container"><h1>{error}</h1></div>;
 
     return (
         <div className="hub-container">
-            <div className="hub-header">
-                <h1>Family Communication Hub</h1>
-                <button className="btn btn-primary">New Message</button>
-            </div>
-
+            <div className="hub-header"><h1>Family Communication Hub</h1></div>
             <div className="hub-main-grid">
-                {/* ----------- Left Side: The Chat Interface ----------- */}
                 <div className="chat-section">
                     <div className="chat-selector-card">
-                        {hubData.chats.map(chat => (
-                            <div key={chat.id} className={`chat-selector-item ${chat.id === activeChatId ? 'active' : ''}`} onClick={() => setActiveChatId(chat.id)}>
-                                <img src={chat.avatar} alt={chat.name} className="avatar" />
-                                <div className="chat-selector-info">
-                                    <p className="chat-name">{chat.name}</p>
-                                    <p className="last-message">{chat.lastMessage}</p>
-                                </div>
-                                {chat.unread > 0 && <span className="unread-dot"></span>}
-                            </div>
-                        ))}
+                        {chats.map(chat => {
+                            const otherUser = chat.isGroupChat ? null : chat.users.find(u => u._id !== currentUser?._id);
+                            const chatName = chat.isGroupChat ? chat.chatName : otherUser?.name || 'User';
+                            const chatAvatar = chat.isGroupChat ? 'https://cdn-icons-png.flaticon.com/512/3004/3004663.png' : otherUser?.avatar || 'https://i.pravatar.cc/150';
+                            const lastMessageText = chat.latestMessage ? `${chat.latestMessage.sender.name}: ${chat.latestMessage.content.substring(0, 20)}...` : (chat.isVirtual ? `Start a conversation` : 'No messages yet');
+                            return (<div key={chat._id} className={`chat-selector-item ${chat._id === activeChatId ? 'active' : ''}`} onClick={() => setActiveChatId(chat._id)}><img src={chatAvatar} alt={chatName} className="avatar" /><div className="chat-selector-info"><p className="chat-name">{chatName}</p><p className="last-message">{lastMessageText}</p></div></div>);
+                        })}
                     </div>
-
                     <div className="active-chat-card">
-                        <div className="active-chat-header">
-                            <h3>{activeChat.name}</h3>
-                            <div className="header-actions">
-                                <span><BellIcon /></span>
-                                <div className="child-mode-indicator"><ShieldIcon /> Child Mode: ON</div>
-                            </div>
-                        </div>
-                        <div className="messages-display">
-                            {hubData.messages[activeChatId].map(msg => {
-                                const sender = hubData.users[msg.userId];
-                                const isSentByMe = msg.userId === hubData.currentUser;
-                                return (
-                                    <div key={msg.id} className={`message-wrapper ${isSentByMe ? 'sent' : 'received'}`}>
-                                        {!isSentByMe && <img src={sender.avatar} alt={sender.name} className="avatar-small" />}
-                                        <div className="message-content">
-                                            {!isSentByMe && <p className="sender-name">{sender.name}</p>}
-                                            {msg.replyTo && <div className="reply-preview">Replying to "Hey everyone..."</div>}
-                                            <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.text.replace(/(@\w+)/g, '<strong>$1</strong>') }}></p>
-                                            <div className="message-meta">
-                                                <div className="reactions">
-                                                    {Object.entries(msg.reactions).map(([emoji, count]) => <span key={emoji}>{emoji} {count}</span>)}
-                                                </div>
-                                                <span className="timestamp">{msg.timestamp}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                        <div className="message-input-box">
-                            <button className="icon-btn"><PaperclipIcon /></button>
-                            <button className="icon-btn"><ClockIcon /></button>
-                            <input type="text" placeholder="Type a message..." value={messageInput} onChange={(e) => setMessageInput(e.target.value)} />
-                            <button className="send-btn"><SendIcon /></button>
-                        </div>
+                        {activeChat ? (
+                            <>
+                                <div className="active-chat-header"><h3>{activeChat.isGroupChat ? activeChat.chatName : activeChat.users.find(u => u._id !== currentUser._id)?.name}</h3><div className="header-actions"><span><BellIcon /></span><div className="child-mode-indicator"><ShieldIcon /> Child Mode: ON</div></div></div>
+                                <div className="messages-display">
+                                    {loading.messages ? <div className="loading-container"><h4>Loading Messages...</h4></div> : activeMessages.map(msg => {
+                                        const isSentByMe = msg.sender._id === currentUser?._id;
+                                        return (<div key={msg._id} className={`message-wrapper ${isSentByMe ? 'sent' : 'received'}`}><div className="message-content">{!isSentByMe && <p className="sender-name">{msg.sender.name}</p>}<p className="message-text">{msg.content}</p><div className="message-meta"><span className="timestamp">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div></div></div>);
+                                    })}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                                <form className="message-input-box" onSubmit={handleSendMessage}><button type="button" className="icon-btn"><PaperclipIcon /></button><input type="text" placeholder="Type a message..." value={messageInput} onChange={(e) => setMessageInput(e.target.value)} /><button type="submit" className="send-btn"><SendIcon /></button></form>
+                            </>
+                        ) : (<div className="no-chat-selected"><h2>Select a chat to start messaging</h2></div>)}
                     </div>
                 </div>
-
-                {/* ----------- Right Side: The Info & Widgets Panel ----------- */}
                 <div className="info-section">
                     <div className="info-card">
-                        {isCreatingPoll ? (
-                            <>
-                                <h4 className="card-title"><PollIcon /> Create a New Poll</h4>
-                                <form className="poll-creator-form" onSubmit={handleCreatePoll}>
-                                    <div className="form-group"><label>Question</label><input type="text" placeholder="e.g., What's for dinner?" value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} required /></div>
-                                    <div className="form-group"><label>Options</label>
-                                        {pollOptions.map((opt, i) => (
-                                            <div key={i} className="option-input-row">
-                                                <input type="text" placeholder={`Option ${i + 1}`} value={opt} onChange={(e) => handleOptionChange(i, e.target.value)} required />
-                                                {pollOptions.length > 2 && <button type="button" className="remove-option-btn" onClick={() => removePollOption(i)}>×</button>}
-                                            </div>
-                                        ))}
+                        <h4 className="card-title"><PollIcon /> Family Polls</h4>
+                        {polls.length > 0 ? (
+                            polls.map(poll => (
+                                <div key={poll._id} className="poll-widget">
+                                    <p className="poll-question">{poll.question}</p>
+                                    <div className="poll-options">
+                                        {poll.options.map(option => {
+                                            const hasVoted = option.votes.includes(currentUser?._id);
+                                            return (<button key={option._id} className={`poll-option-button ${hasVoted ? 'voted' : ''}`} onClick={() => handleVote(poll._id, option._id)}><span>{option.text}</span><strong>{option.votes.length}</strong></button>);
+                                        })}
                                     </div>
-                                    <button type="button" className="add-option-btn" onClick={addPollOption}>+ Add Option</button>
-                                    <div className="form-actions-poll">
-                                        <button type="button" className="btn btn-secondary" onClick={() => setIsCreatingPoll(false)}>Cancel</button>
-                                        <button type="submit" className="btn btn-primary">Launch Poll</button>
-                                    </div>
-                                </form>
-                            </>
-                        ) : (
-                            <>
-                                <h4 className="card-title"><PollIcon /> Active Poll</h4>
-                                <p className="poll-question">{hubData.activePoll.question}</p>
-                                <div className="poll-options">
-                                    {hubData.activePoll.options.map(opt => (
-                                        <div key={opt.text} className="poll-result">
-                                            <span>{opt.text}</span><strong>{Math.round((opt.votes / hubData.activePoll.totalVotes) * 100)}%</strong>
-                                        </div>
-                                    ))}
+                                    <small>Created by {poll.createdBy.name}</small>
                                 </div>
-                                <button className="btn btn-secondary full-width vote-btn">Vote Now</button>
-                                <button className="btn-link" onClick={() => setIsCreatingPoll(true)}>+ Create New Poll</button>
-                            </>
-                        )}
+                            ))
+                        ) : (<p>No active polls for the family.</p>)}
+                        <button className="btn-link" onClick={() => setIsCreatingPoll(true)}>+ Create New Poll</button>
                     </div>
-                    <div className="info-card">
-                        <h4 className="card-title"><PinIcon /> Pinned Notes</h4>
-                        <ul className="pinned-list">{hubData.pinnedNotes.map(note => <li key={note.id}>{note.text}</li>)}</ul>
-                    </div>
-                    <div className="info-card">
-                        <h4 className="card-title"><MediaIcon /> Recent Media</h4>
-                        <div className="media-grid">{hubData.recentMedia.map((src, i) => <img key={i} src={src} alt="media"/>)}</div>
-                        <a href="#" className="view-all-link">View All</a>
-                    </div>
+                    {isCreatingPoll && (
+                        <div className="info-card poll-creator-card">
+                             <h4 className="card-title">Create a New Poll</h4>
+                             <form className="poll-creator-form" onSubmit={handleCreatePoll}><div className="form-group"><label>Question</label><input type="text" placeholder="e.g., Next holiday spot?" value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} required /></div><div className="form-group"><label>Options</label>{pollOptions.map((opt, i) => (<div key={i} className="option-input-row"><input type="text" placeholder={`Option ${i + 1}`} value={opt} onChange={(e) => handleOptionChange(i, e.target.value)} required />{pollOptions.length > 2 && <button type="button" className="remove-option-btn" onClick={() => removePollOption(i)}>×</button>}</div>))}</div><button type="button" className="add-option-btn" onClick={addPollOption}>+ Add Option</button><div className="form-actions-poll"><button type="button" className="btn btn-secondary" onClick={() => setIsCreatingPoll(false)}>Cancel</button><button type="submit" className="btn btn-primary">Launch Poll</button></div></form>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
