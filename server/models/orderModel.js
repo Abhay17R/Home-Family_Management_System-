@@ -43,6 +43,12 @@ createdAt: {
         type: Date,
         default: Date.now,
     },
+     familyId: {
+        type: String,
+        required: [true, 'An order must belong to a family.'],
+    },
+
+   
 });
 
 const Order = mongoose.model('Order', orderSchema);

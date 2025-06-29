@@ -5,8 +5,14 @@ import {User} from '../models/userModel.js';
 
 //new orders
 export const createOrder = catchAsyncError(async (req, res, next) => {
+    // Step 1: Logged-in user ki ID ko request body mein daalein
     req.body.user = req.user.id; 
 
+    // ✅✅ --- YEH HAI FIX --- ✅✅
+    // Step 2: Logged-in user ki familyId ko bhi request body mein daalein
+    req.body.familyId = req.user.familyId;
+    
+    // Ab jab order create hoga, usme user ki ID aur familyId dono honge
     const order = await Order.create(req.body);
 
     res.status(201).json({
@@ -14,7 +20,6 @@ export const createOrder = catchAsyncError(async (req, res, next) => {
         order,
     });
 });
-
 //get orders
 
 // catchAsyncError ko import rehne dein, bas use mat karein
@@ -89,7 +94,7 @@ export const updateOrder = catchAsyncError(async (req, res, next) => {
         return next(new Error('Order not found with this ID'));
     }
 
-    if (order.user.toString() !== req.user.id) {
+    if (req.user.role !== 'admin' &&order.user.toString() !== req.user.id) {
         return next(new Error('You are not authorized to update this order'));
     }
 
@@ -111,7 +116,7 @@ export const deleteOrder = catchAsyncError(async (req, res, next) => {
         return next(new Error('Order not found with this ID'));
     }
 
-    if (order.user.toString() !== req.user.id) {
+    if (req.user.role !== 'admin' && order.user.toString() !== req.user.id) {
         return next(new Error('You are not authorized to delete this order'));
     }
 
