@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import API from '../../api/axios';
 import { io } from 'socket.io-client';
 import '../../styles/Dashboard/Communication.css';
+import familyavatar from '../../img/family.png';
+import defaultavatar from '../../img/dp.png';
 
 // --- Icons ---
 const PinIcon = () => '📌';
@@ -164,7 +166,7 @@ const CommunicationHub = () => {
                         {chats.map(chat => {
                             const otherUser = chat.isGroupChat ? null : chat.users.find(u => u._id !== currentUser?._id);
                             const chatName = chat.isGroupChat ? chat.chatName : otherUser?.name || 'User';
-                            const chatAvatar = chat.isGroupChat ? 'https://cdn-icons-png.flaticon.com/512/3004/3004663.png' : otherUser?.avatar || 'https://i.pravatar.cc/150';
+                            const chatAvatar = chat.isGroupChat ? familyavatar : otherUser?.avatar || defaultavatar;
                             const lastMessageText = chat.latestMessage ? `${chat.latestMessage.sender.name}: ${chat.latestMessage.content.substring(0, 20)}...` : (chat.isVirtual ? `Start a conversation` : 'No messages yet');
                             return (<div key={chat._id} className={`chat-selector-item ${chat._id === activeChatId ? 'active' : ''}`} onClick={() => setActiveChatId(chat._id)}><img src={chatAvatar} alt={chatName} className="avatar" /><div className="chat-selector-info"><p className="chat-name">{chatName}</p><p className="last-message">{lastMessageText}</p></div></div>);
                         })}
