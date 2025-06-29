@@ -5,9 +5,12 @@ import Student from '../models/studentModel.js';
 // @route   GET /api/education/students
 export const getAllStudents = async (req, res) => {
   try {
-    // TODO: Jab user auth add hoga, to user ID se filter karna
-    // const students = await Student.find({ userId: req.user.id });
-    const students = await Student.find({}); // Abhi ke liye saare students fetch kar rahe hain
+    const familyId = req.user.familyId;
+    if (!familyId) {
+      return res.status(401).json({ message: "Unauthorized: No familyId found" });
+    }
+
+    const students = await Student.find({ familyId });
     res.status(200).json(students);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
@@ -25,15 +28,15 @@ export const addStudent = async (req, res) => {
         return res.status(400).json({ message: 'Please provide name, grade, and school' });
     }
 
-    const newStudent = new Student({
-        name,
-        grade,
-        school,
-        feeStatus, // Frontend se aayega
-        grades,    // Frontend se aayega
-        // userId: req.user.id // Baad me add karna
-    });
-
+   const newStudent = new Student({
+  name,
+  grade,
+  school,
+  feeStatus,
+  grades,
+  familyId: req.user.familyId,
+  userId: req.user._id, // ✅ add this line
+});
     const savedStudent = await newStudent.save();
     res.status(201).json(savedStudent);
   } catch (error) {

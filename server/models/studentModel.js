@@ -20,20 +20,21 @@ const feeStatusSchema = new mongoose.Schema({
 // Main Student Schema
 const studentSchema = new mongoose.Schema(
   {
-    // Important: Student ko family/user se link karna zaroori hai
-    // userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    familyId: { type: String, required: true }, // ya ObjectId agar Family model hai
+
     name: { type: String, required: true, trim: true },
     grade: { type: String, required: true },
     school: { type: String, required: true },
-    assignments: [assignmentSchema], // Array of assignments
+    assignments: [assignmentSchema],
     grades: {
-      type: Map, // 'maths': 'A', 'science': 'A+' ke liye perfect hai
+      type: Map,
       of: String,
     },
     feeStatus: feeStatusSchema,
   },
   {
-    timestamps: true, // `createdAt` aur `updatedAt` fields automatically add ho jayengi
+    timestamps: true,
   }
 );
 
