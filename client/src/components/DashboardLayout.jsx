@@ -1,28 +1,48 @@
 // src/components/DashboardLayout.jsx
 
-// ✅ STEP 1: 'useEffect' ko React se aur 'useAuth' ko apne hook se import karein
+// React aur 'useAuth' hook ko import karein
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.js'; // Sahi path check kar lein
+import { useAuth } from '../hooks/useAuth.js'; 
+
+// ✅ STEP 1: Global Context se 'useAppFocus' hook import karein
+import { useAppFocus } from '../context/AppFocusContext.jsx'; 
 
 // Aapke existing components ko import karein
 import Sidebar from './Sidebar'; 
 import Header from './Header';   
-
-// Nayi CSS file
 import './DashboardLayout.css'; 
 
 const DashboardLayout = ({ theme, toggleTheme }) => {
     
-    // ✅ STEP 2: 'useAuth' hook ko call karke 'fetchLoggedInUser' nikalein
     const { fetchLoggedInUser } = useAuth();
+    
+    // ✅ STEP 2: Context se state aur function lein
+    // isActionBlockingFocus: Batayega ki focus ko block karna hai ya nahi
+    // unblockFocusAction: State ko wapas normal (false) karne ke liye
+    const { isActionBlockingFocus, unblockFocusAction } = useAppFocus();
 
-    // Yeh effect bilkul sahi hai. Yeh real-time updates ke liye accha hai.
     useEffect(() => {
         // Yeh function tab call hoga jab user window par wapas aayega
         const handleFocus = () => {
-            console.log("Window focused, re-fetching user data...");
-            fetchLoggedInUser();
+            
+            // ✅ STEP 3: YAHAN HAI MAIN LOGIC
+            // Check karein ki kya global state focus ko block kar raha hai
+            if (isActionBlockingFocus) {
+                console.log("DashboardLayout: Focus was blocked by a file dialog. Unblocking now and skipping fetch.");
+                
+                // State ko reset kar do taaki agli baar fetch ho
+                unblockFocusAction();
+                
+                // Refetch ko skip karne ke liye function se bahar nikal jao
+                return; 
+            }
+            
+            // Agar focus block nahi tha, to normal tareeke se data fetch karo
+            console.log("DashboardLayout: Window focused normally, re-fetching user data...");
+            if (fetchLoggedInUser) {
+                fetchLoggedInUser();
+            }
         };
 
         // Event listener add karein
@@ -32,7 +52,9 @@ const DashboardLayout = ({ theme, toggleTheme }) => {
         return () => {
             window.removeEventListener('focus', handleFocus);
         };
-    }, [fetchLoggedInUser]); // Dependency bilkul sahi hai
+        
+        // Dependency array mein context se aaye hue functions/state daalna zaroori hai
+    }, [fetchLoggedInUser, isActionBlockingFocus, unblockFocusAction]);
     
 
     // Baaki ka JSX bilkul sahi hai

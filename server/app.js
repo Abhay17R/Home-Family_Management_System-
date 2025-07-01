@@ -13,6 +13,8 @@ import educationRoutes from'./routes/educationRoutes.js';
 import locationRouter from './routes/locationRoutes.js';
 import emergencyRouter from './routes/emergencyRoutes.js';
 import communicationRoutes from "./routes/communicationRoutes.js"; 
+import documentRoutes from './routes/documentRoutes.js';
+
 config({ path: "./config.env" });
 
 export const app = express();
@@ -38,6 +40,7 @@ app.use("/api/dashboard", dashboardRoutes);
   app.use('/api/v1/orders', orderRoutes);
   app.use('/api/v1/emergency', emergencyRouter);
    app.use('/api/v1/education', educationRoutes);
+   app.use('/api/v1/documents', documentRoutes);
    app.use('/api/v1/location', locationRouter);
    app.use("/api/v1/communication", communicationRoutes);
 

@@ -239,3 +239,44 @@
     .doc-file-header { flex-direction: column; gap: 1rem; align-items: stretch; }
     .search-input { width: 100%; min-width: auto; }
 }
+/* --- Add this CSS to your document.css file --- */
+
+.doc-folder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px; /* Space for delete button */
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+.doc-folder-item .folder-name-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1; /* Link takes all available space */
+}
+
+.folder-delete-btn {
+    opacity: 0; /* Hide button by default */
+    transition: opacity 0.2s ease-in-out;
+    padding: 4px; /* Make it easier to click */
+    position: absolute; /* Position it relative to the item */
+    right: 10px;
+}
+
+/* Show delete button on hover */
+.doc-folder-item:hover .folder-delete-btn {
+    opacity: 1; 
+}
+
+/* Also show delete button if the item is active */
+.doc-folder-item.active .folder-delete-btn {
+    opacity: 1;
+}
+
+/* --- End of new CSS --- */

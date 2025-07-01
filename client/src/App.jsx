@@ -28,6 +28,7 @@ import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard.jsx";
 import EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
 import OtpChild from "./pages/dashboard/OtpChild";
 import ShoppingAndOrders from "./pages/dashboard/Shopping.jsx"
+import { AppFocusProvider } from './context/AppFocusContext.jsx';
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -133,10 +134,13 @@ const App = () => {
   return (
     // ✅ STEP 4: Sirf AuthProvider istemaal karein
     <AuthProvider>
+      <AppFocusProvider>
       <Router>
         <AppRoutes />
       </Router>
+      </AppFocusProvider>
     </AuthProvider>
+
   );
 };
 
