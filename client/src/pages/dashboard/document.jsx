@@ -111,13 +111,54 @@ const FileManager = () => {
             closeModal(); await fetchFolders(); setSelectedFolder(newFolder);
         } catch (err) { alert('Error creating folder: ' + (err.response?.data?.message || 'Server error')); }
     };
-    const handleDeleteFolder = async (folderId, folderName) => {
-        if (!window.confirm(`Are you sure you want to delete "${folderName}"? ALL files will be deleted.`)) return;
+    // ... (baaki ka code waise hi rahega)
+
+const handleDeleteFolder = async (folderId, folderName) => {
+    if (!window.confirm(`Are you sure you want to delete "${folderName}"? ALL files will be deleted.`)) return;
+
+    // Step 1: Pata lagayein ki kaun sa folder delete ho raha hai (uska index)
+    const folderIndexToDelete = folders.findIndex(f => f._id === folderId);
+    if (folderIndexToDelete === -1) {
+        // Agar kisi wajah se folder list me nahi mila, to normal flow continue karein
+        console.error("Could not find folder to delete in current state.");
+        // Fallback to old behavior
         try {
             await axios.delete(`${API_URL}/folders/${folderId}`, { withCredentials: true });
-            setSelectedFolder(null); fetchFolders();
-        } catch (err) { alert('Could not delete folder: ' + (err.response?.data?.message || 'Server error')); }
-    };
+            setSelectedFolder(null); 
+            fetchFolders();
+        } catch(err) {
+            alert('Could not delete folder: ' + (err.response?.data?.message || 'Server error'));
+        }
+        return;
+    }
+
+    try {
+        // Server se folder delete karein
+        await axios.delete(`${API_URL}/folders/${folderId}`, { withCredentials: true });
+        
+        // Step 2: Local state se us folder ko hatayein
+        const newFolders = folders.filter(f => f._id !== folderId);
+        setFolders(newFolders);
+
+        // Step 3: Naya folder intelligently select karein
+        if (newFolders.length === 0) {
+            // Agar koi folder nahi bacha
+            setSelectedFolder(null);
+        } else {
+            // Naye select hone wale folder ka index calculate karein
+            // Agar last wala delete hua tha, to naye last wale ko select karein
+            // Warna usi index wale ko select karein (jo ab delete hue folder ki jagah le lega)
+            const newIndexToSelect = Math.min(folderIndexToDelete, newFolders.length - 1);
+            setSelectedFolder(newFolders[newIndexToSelect]);
+        }
+        // Ab `fetchFolders()` ko yahan call karne ki zarurat nahi hai, kyunki humne state ko manually update kar diya hai.
+        // Agar aapko server se hamesha fresh list chahiye, to aap `fetchFolders` ko call kar sakte hain,
+        // lekin `setSelectedFolder(null)` wali line hata dein. Ye approach (manual update) zyada efficient hai.
+
+    } catch (err) {
+        alert('Could not delete folder: ' + (err.response?.data?.message || 'Server error'));
+    }
+};
     const handleOpenUploadModal = async () => {
         if (!selectedFolder) return;
         if (selectedFolder.isDefault && !selectedFolder._id) {
