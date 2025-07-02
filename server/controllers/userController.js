@@ -434,7 +434,29 @@ export const getUser= catchAsyncError(async(req,res,next)=>{
     user,
   });
 
-})
+});
+export const updateMyProfile = catchAsyncError(async (req, res, next) => {
+    // Frontend se ye data aayega
+    const { name, email, phone, address, bio } = req.body;
+
+    const user = await User.findById(req.user.id);
+
+    // User se mili jaankari ko update karo
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (address) user.address = address;
+    if (bio) user.bio = bio;
+
+    // Changes ko database mein save karo
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Profile Updated Successfully",
+    });
+});
+
 
 export const forgotPassword = catchAsyncError(async (req, res, next) => {
   // User dhundho jiska email aur verified account ho

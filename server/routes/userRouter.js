@@ -1,11 +1,12 @@
 import express from 'express';
-import { register, verifyOTP,login,logout, forgotPassword , verifyChildOtp ,getAllMyChildren,updateChildProfile,deleteChildProfile} from '../controllers/userController.js';
+import { register, verifyOTP,login,logout, forgotPassword , verifyChildOtp ,getAllMyChildren,updateChildProfile,deleteChildProfile,updateMyProfile } from '../controllers/userController.js';
 import { getUser } from '../controllers/userController.js';
 import { resetPassword } from '../controllers/userController.js';
 import {createChildUser} from '../controllers/userController.js';
 import { isAuthenticated, authorizeRoles } from '../middleware/auth.js';
 import { checkPermission } from '../middleware/permission.js';
 
+// import { singleUpload } from '../middleware/multer.js'; 
 const router = express.Router();
 
 router.post('/register', register);
@@ -13,7 +14,7 @@ router.post('/register', register);
 router.post("/otp-verification",verifyOTP);
 router.post("/login",login);
 router.get("/logout",isAuthenticated,logout);
-router.get("/me",isAuthenticated,getUser);
+// router.get("/me",isAuthenticated,getUser);
 router.post("/password/forgot",forgotPassword);
 router.put("/password/reset/:token",resetPassword);
 router.post('/admin/create-child', isAuthenticated, authorizeRoles('admin'), createChildUser);
@@ -24,6 +25,9 @@ router.post(
     authorizeRoles('admin', 'parent'),
     createChildUser
 );
+router.route("/me")
+    .get(isAuthenticated, getUser)
+    .put(isAuthenticated, updateMyProfile);
 
 // ✅ YEH HAI AAPKA NAYA ROUTE
 router.post(

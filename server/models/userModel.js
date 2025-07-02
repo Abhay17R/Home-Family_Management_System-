@@ -20,6 +20,15 @@ const userSchema = new mongoose.Schema({
     required: true,
     lowercase: true,
   },
+   bio: {
+    type: String,
+    default: '',
+    maxLength: [250, "Bio can't exceed 250 characters"]
+  },
+  avatar: {
+    public_id: { type: String, default: 'avatars/default_avatar' }, // Default avatar id
+    url: { type: String, default: 'https://i.pravatar.cc/150?img=12' } // Default avatar url
+  },
   password: {
     type: String,
     minLength: [8, "Password must contain at least 8 characters."],
