@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+// import defaultavatar from '../../img/dp.png';
+
 
 const SessionSchema=new mongoose.Schema({
   token:{type:String,required:true},
@@ -27,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     public_id: { type: String, default: 'avatars/default_avatar' }, // Default avatar id
-    url: { type: String, default: 'https://i.pravatar.cc/150?img=12' } // Default avatar url
+    url: { type: String, default: 'https://i.postimg.cc/3rgrqVDw/dp.png' } // Default avatar url
   },
   password: {
     type: String,
