@@ -104,13 +104,13 @@ const DashboardHome = () => {
           <p>Welcome back to your Family Dashboard</p>
         </div>
         {/* User profile section pehle jaisa hi hai, aap isko bhi dynamic bana sakte hain */}
-        <div className="user-profile">
+        {/* <div className="user-profile">
           <img src='https://i.pravatar.cc/50?u=admin' alt="Admin" className="avatar" />
           <div className="user-details">
             <span className="user-name">Admin</span>
             <span className="current-date">Tuesday, April 23</span>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
       </header>
       
       {/* TOP STATS GRID: Saare numbers API se aa rahe hain */}
