@@ -376,3 +376,9 @@
       align-items: flex-start;
   }
 }
+.action-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}

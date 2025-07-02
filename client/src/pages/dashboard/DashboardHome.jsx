@@ -7,9 +7,12 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 
 // Icons (yeh pehle se hi the)
 import { FaFileInvoiceDollar, FaRegCommentDots, FaTasks, FaExclamationTriangle, FaMapMarkerAlt, FaPlus, FaUpload, FaGift } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
 
 // CSS file (yeh pehle se hi thi)
 import '../../styles/Dashboard/dashboard.css';
+
 
 // Chart ke liye colors define kar lete hain
 const COLORS = {
@@ -24,6 +27,7 @@ const COLORS = {
 };
 
 const DashboardHome = () => {
+  const navigate = useNavigate();
   // State variables data, loading, aur error ko manage karne ke liye
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,19 +59,23 @@ const DashboardHome = () => {
   }, []); // Empty array ka matlab hai ki yeh effect sirf ek baar chalega
 
   // Action buttons ke liye placeholder functions
-  const handleAddExpense = () => {
+  const handleShopping = () => {
     // Yahan aap user ko naye expense page par navigate kar sakte hain
-    // Example: navigate('/expenses/new');
-    alert('Add Expense Clicked!');
+    // Example: 
+    alert('LETS GOOOO!');
+    navigate('/dashboard/orders');
   };
 
   const handleUploadDocument = () => {
     // Yahan file upload ka modal open kar sakte hain
     alert('Upload Certificate Clicked!');
+    navigate('/dashboard/documents');
   };
 
-  const handleAddToWishlist = () => {
-    alert('Add to Wishlist Clicked!');
+  const handleChat = () => {
+    alert('Chat button clicked!');
+     navigate('/dashboard/communication');
+
   };
 
 
@@ -221,21 +229,28 @@ const DashboardHome = () => {
         </div>
       </main>
       
-      {/* BOTTOM ACTION BUTTONS */}
-      <div className="bottom-actions-grid">
-        <div className="action-button-card" onClick={handleAddExpense}>
-            <FaPlus className="action-icon" />
-            <span>Add Expense</span>
+        {/* BOTTOM ACTION BUTTONS */}
+        <div className="bottom-actions-grid">
+          <div className="action-button-card" onClick={handleShopping}>
+            <img src="https://i.postimg.cc/6QsG7FZk/Screenshot-2025-07-02-233106.png" />
+          
+              {/* <FaPlus className="action-icon" /> */}
+              <span>Shopping</span>
+          </div>
+          <div className="action-button-card" onClick={handleUploadDocument}>
+             
+               <img src="https://i.postimg.cc/tT4R7zr0/Screenshot-2025-07-02-233558.png" alt="Shopping" className="action-image" />
+              <span>Upload Document</span>
+          </div>
+          <div className="action-button-card" onClick={handleChat}>
+              <img src="https://i.postimg.cc/3x1PWQzR/Screenshot-2025-07-02-232955.png" alt="Shopping" className="action-image" />
+           
+
+              {/* <FaGift className="action-icon" /> */}
+
+              <span>Chat</span>
+          </div>
         </div>
-        <div className="action-button-card" onClick={handleUploadDocument}>
-            <FaUpload className="action-icon" />
-            <span>Upload Document</span>
-        </div>
-        <div className="action-button-card" onClick={handleAddToWishlist}>
-            <FaGift className="action-icon" />
-            <span>Add to Wishlist</span>
-        </div>
-      </div>
     </div>
   );
 };
