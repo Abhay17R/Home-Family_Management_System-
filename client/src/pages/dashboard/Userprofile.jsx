@@ -1,6 +1,7 @@
-import React, { useState, useEffect, Children } from 'react';
-import API from '../../api/axios'; // Apne custom axios instance ko import karein
+import React, { useState, useEffect, useRef } from 'react'; // 1. useRef ko import kiya gaya hai
+import API from '../../api/axios';
 import '../../styles/Dashboard/Userprofile.css';
+import { useAppFocus } from '../../context/AppFocusContext'; // 2. AppFocusContext ko import kiya gaya hai
 
 // Helper function to format the join date nicely
 const formatJoinDate = (isoDate) => {
@@ -31,14 +32,17 @@ const UserProfile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 3. useRef aur useAppFocus ko setup kiya gaya hai
+    const avatarInputRef = useRef(null);
+    const { blockFocusAction } = useAppFocus();
+
     // Fetch user profile data when the component loads
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
                 setLoading(true);
-                const { data } = await API.get('/me');
+                const { data } = await API.get('/me'); // Aapke bataye अनुसार /me endpoint
                 
-                // Split full name into first and last name for the form
                 const [firstName, ...lastNameParts] = data.user.name.split(' ');
 
                 setUserData({
@@ -56,7 +60,6 @@ const UserProfile = () => {
                 setLoading(false);
             }
         };
-
         fetchUserProfile();
     }, []);
 
@@ -78,7 +81,7 @@ const UserProfile = () => {
                 secondaryPhone: userData.secondaryPhone
             };
             
-            const { data } = await API.put('/me', profileDataToUpdate);
+            const { data } = await API.put('/me', profileDataToUpdate); // Aapke bataye अनुसार /me endpoint
             alert(data.message || 'Profile updated successfully!');
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to update profile.');
@@ -95,11 +98,10 @@ const UserProfile = () => {
         formData.append('avatar', file);
 
         try {
-            const { data } = await API.put('/me/avatar', formData, {
+            const { data } = await API.put('/me/avatar', formData, { // Aapke bataye अनुसार /me/avatar endpoint
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             
-            // Immediately update the avatar URL in the state to show the new image
             setUserData(prev => ({...prev, avatar: data.avatar}));
             alert('Avatar updated successfully!');
         } catch (err) {
@@ -108,34 +110,48 @@ const UserProfile = () => {
         }
     };
 
-    // Display loading state
     if (loading) {
         return <div className="profile-container"><h1>Loading Profile...</h1></div>;
     }
 
-    // Display error state
     if (error) {
         return <div className="profile-container"><h1 className="error-message">{error}</h1></div>;
     }
 
-    // Render the main component
     return (
         <div className="profile-container">
             <h1 className="profile-header">User Profile</h1>
             <div className="profile-grid">
-                {/* Left Card: User Summary & Avatar */}
                 <div className="profile-card summary-card">
                     <div className="avatar-container">
                         <img src={userData.avatar?.url} alt="User Avatar" className="avatar-image" />
-                        <input type="file" id="avatar-upload" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
-                        <label htmlFor="avatar-upload" className="change-avatar-btn">Change Photo</label>
+                        
+                        {/* Hidden file input ko ref diya gaya hai */}
+                        <input 
+                            type="file" 
+                            ref={avatarInputRef} 
+                            id="avatar-upload" 
+                            accept="image/*" 
+                            style={{ display: 'none' }} 
+                            onChange={handleAvatarChange} 
+                        />
+                        
+                        {/* Is button ke onClick par focus blocking ka logic hai */}
+                        <button 
+                            className="change-avatar-btn"
+                            onClick={() => {
+                                blockFocusAction();
+                                avatarInputRef.current?.click();
+                            }}
+                        >
+                            Change Photo
+                        </button>
                     </div>
                     <h2 className="user-name">{userData.name}</h2>
-                    <p className="user-role">{userData.role=='admin'?'admin':'member'}</p>
+                    <p className="user-role">{userData.role === 'admin' ? 'Administrator' : 'Member'}</p>
                     <div className="join-date"><span>📅</span> {joinDate}</div>
                 </div>
 
-                {/* Right Card: User Details Form */}
                 <div className="profile-card details-card">
                     <h3 className="details-header">Profile Details</h3>
                     <form className="profile-form" onSubmit={handleSubmit}>
@@ -143,7 +159,7 @@ const UserProfile = () => {
                             <div className="form-group"><label htmlFor="firstName">First Name</label><input type="text" id="firstName" value={userData.firstName} onChange={handleInputChange} /></div>
                             <div className="form-group"><label htmlFor="lastName">Last Name</label><input type="text" id="lastName" value={userData.lastName} onChange={handleInputChange} /></div>
                         </div>
-                        <div className="form-group"><label htmlFor="email">Email Address</label><input type="email" id="email" value={userData.email} /></div>
+                        <div className="form-group"><label htmlFor="email">Email Address</label><input type="email" id="email" value={userData.email} onChange={handleInputChange}/></div>
                         <div className="form-group"><label htmlFor="phone">Phone Number</label><input type="tel" id="phone" value={userData.phone || ''} readOnly className="form-input-readonly" /></div>
                         {/* <div className="form-group"><label htmlFor="secondaryPhone">Secondary Phone</label><input type="tel" id="secondaryPhone" value={userData.secondaryPhone || ''} onChange={handleInputChange} /></div> */}
                         <div className="form-group"><label htmlFor="address">Address</label><input type="text" id="address" value={userData.address || ''} onChange={handleInputChange} /></div>

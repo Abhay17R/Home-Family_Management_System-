@@ -6,6 +6,9 @@ import twilio from "twilio";
 import dotenv from 'dotenv';
 import { sendToken } from "../utils/sendToken.js";
 import crypto from "crypto";
+import fs from 'fs'; // File System module for deleting files
+// import { v2 as cloudinary } from 'cloudinary'; 
+import cloudinary from '../utils/cloudinary.js'
 
 import { ExportConfigurationContextImpl } from "twilio/lib/rest/bulkexports/v1/exportConfiguration.js";
 dotenv.config({ path: 'config.env' });
@@ -413,6 +416,68 @@ export const login = catchAsyncError(async (req, res, next) => {
 });
 
 
+
+export const updateAvatar = catchAsyncError(async (req, res, next) => {
+    // 1. Temporary file ka path lo
+    const localFilePath = req.file ? req.file.path : null;
+
+    // 2. Agar file upload hi nahi hui (multer ne pass nahi ki)
+    if (!localFilePath) {
+        return next(new ErrorHandler('Please upload a file.', 400));
+    }
+
+    try {
+        const user = await User.findById(req.user.id);
+
+        // 3. Purane avatar ko Cloudinary se delete karo
+        // Yeh check zaroori hai taaki default avatar delete na ho
+        if (user.avatar && user.avatar.public_id && user.avatar.public_id !== "avatars/default_avatar") {
+            try {
+                await cloudinary.uploader.destroy(user.avatar.public_id);
+            } catch (error) {
+                // Agar purana avatar delete karne me error aaye, to use log karo,
+                // lekin process ko roko mat. Naya avatar upload hona zaroori hai.
+                console.error("Failed to delete old avatar from Cloudinary:", error);
+            }
+        }
+
+        // 4. Nayi file ko Cloudinary par upload karo
+        const result = await cloudinary.uploader.upload(localFilePath, {
+            folder: "avatars",          // Avatars ke liye ek alag folder
+            resource_type: "image",     // Hum sirf image hi expect kar rahe hain
+            width: 150,
+            height: 150,
+            crop: "fill",               // Image ko 150x150 me fit karega
+            gravity: "face"             // Agar face detect hota hai, to use center me rakhega
+        });
+
+        // 5. User ke database record mein naye avatar ka URL aur public_id save karo
+        user.avatar = {
+            public_id: result.public_id,
+            url: result.secure_url,
+        };
+        await user.save();
+        
+        // 6. Success response bhejo
+        res.status(200).json({
+            success: true,
+            message: "Avatar Updated Successfully",
+            avatar: user.avatar, // Naya avatar object frontend ko wapas bhejo
+        });
+
+    } catch (error) {
+        // Agar Cloudinary upload ya database save me koi error aata hai
+        console.error("Error during avatar upload process:", error);
+        return next(new ErrorHandler('Avatar processing failed. Please try again.', 500));
+    
+    } finally {
+        // 7. Hamesha temporary file ko delete karo (chahe error aaye ya na aaye)
+        // Check zaroori hai taaki code crash na ho agar file path na ho
+        if (localFilePath && fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
+    }
+});
 
 export  const logout=catchAsyncError(async(req,res,next)=>{
   res.status(200).cookie("token","", {
