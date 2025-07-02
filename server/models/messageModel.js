@@ -16,7 +16,14 @@ const messageModel = new mongoose.Schema({
         type: Map,
         of: Number,
         default: {}
-    }
+    },
+     readBy: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }],
+        default: [] // Default me khaali array
+    },
 }, { timestamps: true });
 
 export default mongoose.model("Message", messageModel);

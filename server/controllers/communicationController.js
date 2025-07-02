@@ -139,3 +139,21 @@ export const addPinnedNote = catchAsyncError(async (req, res, next) => {
     io.to(req.user.familyId).emit('pinned_notes_updated', { chatId: chatId, pinnedNotes: chat.pinnedNotes });
     res.status(200).json({ success: true, pinnedNotes: chat.pinnedNotes });
 });
+// controllers/communicationController.js
+
+export const markChatAsRead = catchAsyncError(async (req, res, next) => {
+    const { _id: userId } = req.user;
+    const { chatId } = req.params;
+
+    // Us chat ke saare messages ko update karo jinko user ne abhi tak nahi padha hai.
+    // $addToSet operator user ki ID ko 'readBy' array me daal dega, lekin sirf tab agar woh pehle se usme na ho.
+    await Message.updateMany(
+        { chat: chatId, readBy: { $ne: userId } }, // Condition: Is chat ke woh messages jinko user ne nahi padha
+        { $addToSet: { readBy: userId } }         // Action: User ki ID ko readBy array me daal do
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Messages marked as read."
+    });
+});

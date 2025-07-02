@@ -14,6 +14,7 @@ import locationRouter from './routes/locationRoutes.js';
 import emergencyRouter from './routes/emergencyRoutes.js';
 import communicationRoutes from "./routes/communicationRoutes.js"; 
 import documentRoutes from './routes/documentRoutes.js';
+import homeRoutes from './routes/homeRoutes.js';
 
 config({ path: "./config.env" });
 
@@ -43,6 +44,7 @@ app.use("/api/v1/dashboard", dashboardRoutes);
    app.use('/api/v1/documents', documentRoutes);
    app.use('/api/v1/location', locationRouter);
    app.use("/api/v1/communication", communicationRoutes);
+   app.use("/api/v1/HOME", homeRoutes);
 
 connection();
 

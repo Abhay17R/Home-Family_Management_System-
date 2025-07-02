@@ -29,6 +29,10 @@ const expenseSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+     familyId: { // <-- YEH ADD KAREIN
+        type: String,
+        required: true
+    },
 }, {
     timestamps: true
 });
