@@ -2,7 +2,7 @@
     import File from '../models/fileModel.js';
     import { catchAsyncError } from '../middleware/catchAsyncError.js';
     import ErrorHandler from '../middleware/error.js';
-    import { v2 as cloudinary } from 'cloudinary';
+    import cloudinary from '../utils/cloudinary.js'
     import fs from 'fs'; // File System ko import karna zaroori hai temp file delete karne ke liye
 
     // --- FOLDER CONTROLLERS (Inmein koi badlav nahi) ---
