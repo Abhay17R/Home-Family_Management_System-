@@ -296,3 +296,39 @@
     grid-template-columns: 1fr;
   }
 }
+/* ... Aapka baaki CSS ... */
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: auto; /* Isko right side me push karega */
+  margin-right: 10px;
+}
+
+.status-dot.online {
+  background-color: #22c55e; /* Green */
+}
+
+.status-dot.away {
+  background-color: #f59e0b; /* Amber */
+}
+
+.status-dot.offline {
+  background-color: #6b7280; /* Gray */
+}
+
+.status-text {
+    font-size: 0.8rem;
+    color: #6b7280; /* Gray */
+    margin-left: -8px; /* Dot ke thoda paas */
+}
+
+.error-message-bar {
+    background-color: #fef2f2;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #fecaca;
+}

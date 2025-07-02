@@ -7,6 +7,11 @@ const messageModel = new mongoose.Schema({
     chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
     replyTo: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
     // Reactions ke liye Map use karna best hai. Example: { '❤️': 2, '👍': 5 }
+
+      familyId: {
+        type: String,
+        required: true,
+    },
     reactions: {
         type: Map,
         of: Number,

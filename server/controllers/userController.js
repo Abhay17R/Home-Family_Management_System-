@@ -8,6 +8,7 @@ import { sendToken } from "../utils/sendToken.js";
 import crypto from "crypto";
 import fs from 'fs'; // File System module for deleting files
 // import { v2 as cloudinary } from 'cloudinary'; 
+import { getSocketServerInstance } from '../socket/socket.js';
 import cloudinary from '../utils/cloudinary.js'
 
 import { ExportConfigurationContextImpl } from "twilio/lib/rest/bulkexports/v1/exportConfiguration.js";
@@ -361,7 +362,7 @@ export const login = catchAsyncError(async (req, res, next) => {
   }
 
   // Select password + role, familyId, parentId to send back
-  const user = await User.findOne({ email, accountVerified: true }).select("+password role familyId parentId");
+  const user = await User.findOne({ email, accountVerified: true }).select("+password");
 
   if (!user) {
     return next(new ErrorHandler("Invalid email or password", 400));
@@ -632,6 +633,11 @@ export const getAllMyChildren= (async(req,res,next)=>{
       runValidators:true,
 
     }).select('-password');
+        const io = getSocketServerInstance();
+        if (req.user.familyId) {
+            io.to(req.user.familyId).emit('userUpdated');
+            console.log(`✅ Event Bheja: 'userUpdated' to family ${req.user.familyId}`);
+        }
     res.status(200).json({
       success:true,
       message:'Profile updated successfully',
