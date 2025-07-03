@@ -3,6 +3,7 @@ import axios from 'axios';
 import API from '../../api/axios';
 import { formatDistanceToNow } from 'date-fns'; // Time ko format karne ke liye
 import '../../styles/Dashboard/Analytic.css';
+import { useAuth } from '../../hooks/useAuth.js';
 
 // --- SVG Icons (Inmein koi badlav nahi) ---
 const UsersIcon = () => (
@@ -20,6 +21,7 @@ const OnlineIcon = () => (
 
 
 function AnalyticsDashboard() {
+  const { dashboardVersion } = useAuth();
   
   // States to hold data from API
   const [stats, setStats] = useState({
@@ -69,7 +71,7 @@ function AnalyticsDashboard() {
         }
     };
     fetchDashboardData();
-  }, []); // [] ka matlab yeh sirf ek baar component mount hone par chalega
+  }, [dashboardVersion]); // [] ka matlab yeh sirf ek baar component mount hone par chalega
 
 
   return (

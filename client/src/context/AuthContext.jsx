@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
       const [socketVersion, setSocketVersion] = useState(0);
-
+    const [dashboardVersion, setDashboardVersion] = useState(0);
     // --- FUNCTION 1: LOGIN LOGIC ---
     // Yeh function Login component se call hoga
     const login = async (email, password) => {
@@ -106,9 +106,12 @@ export const AuthProvider = ({ children }) => {
             // 'dashboardUpdate' event ko suno (jaise online status change)
             // Iske liye aapko AnalyticsDashboard.jsx me badlav karna hoga, jo humne pehle discuss kiya tha
             socket.on('dashboardUpdate', () => {
-                console.log('🔥 Real-time "dashboardUpdate" event mila!');
-                // Yahan aap ek alag state update kar sakte hain jo dashboard ko refresh karegi
+                console.log('🔥 Real-time "dashboardUpdate" event mila! Triggering refresh.');
+                // Yahan state update karne se dashboard refresh hoga
+                setDashboardVersion(prevVersion => prevVersion + 1); 
             });
+
+
 
             // Cleanup function
             return () => {
@@ -129,7 +132,7 @@ export const AuthProvider = ({ children }) => {
     }, [user]); // Yeh effect `user` object par depend karta hai
 
     // Sabhi zaroori cheezein value prop se poori app ko do
-   const value = { user, isLoading, login, logout, fetchLoggedInUser, setUser, socketVersion };
+   const value = { user, isLoading, login, logout, fetchLoggedInUser, setUser, socketVersion,dashboardVersion };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
