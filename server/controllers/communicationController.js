@@ -66,7 +66,7 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
         }
     }
     if (!content || !targetChatId) return res.status(400).json({ message: "Invalid data." });
-    const message = await Message.create({ sender: req.user._id, content: content, chat: targetChatId });
+    const message = await Message.create({ sender: req.user._id, content: content, chat: targetChatId,familyId: req.user.familyId });
     const populatedMessage = await message.populate([{ path: "sender", select: "name avatar" }, { path: "chat", populate: { path: "users", select: "name email avatar" } }]);
     await Chat.findByIdAndUpdate(targetChatId, { latestMessage: populatedMessage._id });
     const io = getSocketServerInstance();

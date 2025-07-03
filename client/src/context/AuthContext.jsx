@@ -6,9 +6,12 @@ import { io } from 'socket.io-client';
 
 // 1. Context banaya
 export const AuthContext = createContext();
+//  export let socket = null;
 
 // 2. Socket instance ko context ke bahar rakhein taaki re-renders par reset na ho
+
 let socket;
+export const getSocket = () => socket;
 
 // 3. Provider component jo poori app ko wrap karega
 export const AuthProvider = ({ children }) => {
@@ -38,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     
     // --- FUNCTION 2: LOGOUT LOGIC ---
     // Yeh function logout button se call hoga
+   
     const logout = async () => {
         try {
             await axios.get('http://localhost:4000/api/v1/logout', { withCredentials: true });
