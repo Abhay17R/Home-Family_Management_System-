@@ -25,7 +25,9 @@ const COLORS = {
     Education: '#775DD0',
     Health: '#4CAF50',
 };
-
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+);
 const DashboardHome = () => {
   const navigate = useNavigate();
   // State variables data, loading, aur error ko manage karne ke liye
@@ -116,11 +118,13 @@ const DashboardHome = () => {
       {/* TOP STATS GRID: Saare numbers API se aa rahe hain */}
       <div className="stats-grid">
         <div className="stat-card">
-          <FaFileInvoiceDollar className="card-icon bills" />
+          {/* <FaFileInvoiceDollar className="card-icon bills" /> */}
+           <div className="stat-icon-wrapper" style={{ backgroundColor: 'rgba(79, 70, 229, 0.1)', color: 'rgb(79, 70, 229)' }}>  <UsersIcon /></div>
+        
           <div className="card-info">
-            <span className="card-title">Bills Due</span>
-            <span className="card-value">{dashboardData.stats.billsDue}</span>
-            <span className="card-subtitle">unpaid bills</span>
+            <span className="card-title">Total Members</span>
+            <span className="card-value">{dashboardData.stats.totalMembers}</span>
+            <span className="card-subtitle">Members in your family group</span>
           </div>
         </div>
         <div className="stat-card">
@@ -209,6 +213,7 @@ const DashboardHome = () => {
               )}
             </ul>
           </div>
+          
 
           <div className="dashboard-widget family-status">
             <h3 className="widget-title">Family Member Status</h3>

@@ -13,6 +13,7 @@ export const getDashboardData = catchAsyncError(async (req, res, next) => {
 
     // Hum saare database calls ek saath parallel me karenge Promise.all se, taaki speed tez rahe.
     const [
+        familyMembersResult,
         unpaidBillsCount,
         activeAlertsCount,
         sharedLocationsCount,
@@ -23,6 +24,7 @@ export const getDashboardData = catchAsyncError(async (req, res, next) => {
         unreadMessagesCount,
         upcomingAssignmentsCount
     ] = await Promise.all([
+        User.find({ familyId }).select("name avatar isOnline lastSeen"),
         
         // 1. Bills Due: Abhi ke liye hum is mahine ke saare expenses count kar rahe hain.
         //    Behtar tareeka: Expense model me 'status: "unpaid"' field add karna.
@@ -39,7 +41,7 @@ export const getDashboardData = catchAsyncError(async (req, res, next) => {
         Alert.countDocuments({ familyId, status: 'Active' }),
 
         // 3. Location: Kitne members location share kar rahe hain. Yeh bhi perfect hai.
-        User.countDocuments({ familyId, isSharing: true, _id: { $ne: userId } }), // Khud ko count na karein
+        User.countDocuments({ familyId, isSharing: true, _id: { $ne: userId } }), // Khud ko count na karein    
 
         // 4. Monthly Expense Summary (Chart ke liye)
         //    Is mahine ke expenses ko category ke hisaab se group karke total amount nikalenge.
@@ -73,6 +75,7 @@ export const getDashboardData = catchAsyncError(async (req, res, next) => {
         // 8. Upcoming Assignments: Iske liye ek alag `Assignment` model chahiye hoga. Abhi dummy data.
         Promise.resolve(2), // DUMMY VALUE
     ]);
+    const totalMembers = familyMembersResult.length;
 
     // Ab saara data frontend ke liye ek object me daal kar bhej do.
     res.status(200).json({
@@ -86,14 +89,18 @@ export const getDashboardData = catchAsyncError(async (req, res, next) => {
                 unreadMessages: unreadMessagesCount,
                 upcomingAssignments: upcomingAssignmentsCount,
                 alerts: activeAlertsCount,
-                locationsShared: sharedLocationsCount
+                locationsShared: sharedLocationsCount,
+                totalMembers:totalMembers,
             },
             expenseSummary: monthlyExpenseSummary,
+            
             quickActions: recentActivities.map(activity => ({
                 user: activity.user.name,
                 avatar: activity.user.avatar.url,
-                action: activity.action
+                action: activity.action,
+                
             })),
+            
             familyStatus: familyMembers.map(member => ({
                 name: member.name,
                 avatar: member.avatar.url,
