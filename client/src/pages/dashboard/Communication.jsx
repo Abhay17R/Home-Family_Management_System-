@@ -3,7 +3,10 @@ import API from '../../api/axios';
 import '../../styles/Dashboard/Communication.css';
 import familyavatar from '../../img/family.png';
 import defaultavatar from '../../img/dp.png';
-import { getSocket } from '../../context/AuthContext';
+// CHANGE 1: Import useAuth and the real getSocket
+import { getSocket, } from '../../context/AuthContext'; 
+import {useAuth} from '../../hooks/useAuth';
+
 
 const PinIcon = () => '📌';
 const PollIcon = () => '📊';
@@ -12,14 +15,14 @@ const PaperclipIcon = () => '📎';
 const BellIcon = () => '🔔';
 const ShieldIcon = () => '🛡️';
 
-const getAuthToken = () => {
-  const cookies = document.cookie.split('; ');
-  const tokenCookie = cookies.find(row => row.startsWith('token='));
-  return tokenCookie ? tokenCookie.split('=')[1] : null;
-};
-
 const CommunicationHub = () => {
-  const [currentUser, setCurrentUser] = useState(null);
+  // CHANGE 2: Get user and socketVersion from the context
+  const { user: currentUser, socketVersion } = useAuth();
+  
+  // DELETE the local currentUser state and getAuthToken function
+  // const [currentUser, setCurrentUser] = useState(null); // This is now handled by useAuth
+  // const getAuthToken = () => { ... }; // This is no longer needed
+
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState({});
   const [polls, setPolls] = useState([]);
@@ -35,30 +38,34 @@ const CommunicationHub = () => {
   const activeChat = chats.find(c => c._id === activeChatId);
   const activeMessages = messages[activeChatId] || [];
 
+  // CHANGE 3: Simplify the initial data fetch
   useEffect(() => {
-    const fetchInitialData = async () => {
-      setLoading({ initial: true, messages: false });
-      try {
-        const [userRes, chatsRes, pollsRes] = await Promise.all([
-          API.get('/me'),
-          API.get('/communication/chats'),
-          API.get('/communication/polls'),
-        ]);
-        setCurrentUser(userRes.data.user);
-        setChats(chatsRes.data.chats);
-        setPolls(pollsRes.data.polls || []);
-        if (chatsRes.data.chats.length > 0) {
-          const groupChat = chatsRes.data.chats.find(c => c.isGroupChat);
-          setActiveChatId(groupChat ? groupChat._id : chatsRes.data.chats[0]._id);
+    // This effect now depends on currentUser from the context
+    if (currentUser) {
+      const fetchInitialData = async () => {
+        setLoading({ initial: true, messages: false });
+        try {
+          // No need to fetch user again! We have it from the context.
+          const [chatsRes, pollsRes] = await Promise.all([
+            API.get('/communication/chats'),
+            API.get('/communication/polls'),
+          ]);
+          setChats(chatsRes.data.chats);
+          setPolls(pollsRes.data.polls || []);
+          if (chatsRes.data.chats.length > 0) {
+            const groupChat = chatsRes.data.chats.find(c => c.isGroupChat);
+            setActiveChatId(groupChat ? groupChat._id : chatsRes.data.chats[0]._id);
+          }
+        } catch (err) {
+          setError("Could not load your hub. Please try again.");
+        } finally {
+          setLoading({ initial: false, messages: false });
         }
-      } catch (err) {
-        setError("Could not load your hub. Please try again.");
-      } finally {
-        setLoading({ initial: false, messages: false });
-      }
-    };
-    fetchInitialData();
-  }, []);
+      };
+      fetchInitialData();
+    }
+  }, [currentUser]); // This now correctly depends on the user from the context
+
 
   const fetchChatMessages = useCallback(async (chatId) => {
     if (!chatId || String(chatId).startsWith('virtual-')) {
@@ -80,43 +87,63 @@ const CommunicationHub = () => {
     if (activeChatId) fetchChatMessages(activeChatId);
   }, [activeChatId, fetchChatMessages]);
 
-  // ✅ Socket setup
+  // CHANGE 4: The MAGIC FIX for your socket listeners
   useEffect(() => {
-    if (!currentUser) return;
-    const token = getAuthToken();
-    if (!token) return;
+    // Don't do anything if we don't have a user or if the first version of the socket isn't ready.
+    if (!currentUser || socketVersion === 0) {
+      return;
+    }
 
+    // Get the LATEST socket instance from the AuthContext.
     const socket = getSocket();
+    if (!socket) {
+      return;
+    }
 
-    // Cleanup existing listeners first
-    socket.off('virtual_chat_created');
-    socket.off('new_message');
-    socket.off('new_poll');
-    socket.off('poll_updated');
+    console.log(`Attaching chat listeners to socket version: ${socketVersion}`);
 
-    socket.on('virtual_chat_created', ({ virtualId, newChat }) => {
+    const handleVirtualChatCreated = ({ virtualId, newChat }) => {
       setChats(prev => prev.map(c => c._id === virtualId ? newChat : c));
       setActiveChatId(newChat._id);
-      fetchChatMessages(newChat._id); // 🆕 fetch message immediately
-    });
+      fetchChatMessages(newChat._id);
+    };
 
-    socket.on('new_message', (newMessage) => {
+    const handleNewMessage = (newMessage) => {
       const chatId = newMessage.chat._id;
       setMessages(prev => ({ ...prev, [chatId]: [...(prev[chatId] || []), newMessage] }));
       setChats(prev => prev.map(c => c._id === chatId ? { ...c, latestMessage: newMessage, updatedAt: newMessage.createdAt } : c)
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
-    });
+    };
 
-    socket.on('new_poll', (newPoll) => setPolls(prev => [newPoll, ...prev]));
-    socket.on('poll_updated', (updatedPoll) => {
+    const handleNewPoll = (newPoll) => setPolls(prev => [newPoll, ...prev]);
+    const handlePollUpdated = (updatedPoll) => {
       setPolls(prevPolls => prevPolls.map(p => p._id === updatedPoll._id ? updatedPoll : p));
-    });
+    };
 
-  }, [currentUser, fetchChatMessages]);
+    socket.on('virtual_chat_created', handleVirtualChatCreated);
+    socket.on('new_message', handleNewMessage);
+    socket.on('new_poll', handleNewPoll);
+    socket.on('poll_updated', handlePollUpdated);
+
+    // This cleanup function is CRITICAL. It removes the listeners when the socket version changes.
+    return () => {
+      console.log(`Detaching chat listeners from socket version: ${socketVersion}`);
+      if (socket) {
+        socket.off('virtual_chat_created', handleVirtualChatCreated);
+        socket.off('new_message', handleNewMessage);
+        socket.off('new_poll', handleNewPoll);
+        socket.off('poll_updated', handlePollUpdated);
+      }
+    };
+    
+  }, [socketVersion, currentUser, fetchChatMessages]); // This effect now re-runs whenever the socketVersion changes!
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeMessages]);
+
+  // --- All your handler functions below this line are OK and don't need changes ---
 
   const handleSendMessage = async (e) => {
     e.preventDefault();

@@ -17,6 +17,7 @@ export const getSocket = () => socket;
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+      const [socketVersion, setSocketVersion] = useState(0);
 
     // --- FUNCTION 1: LOGIN LOGIC ---
     // Yeh function Login component se call hoga
@@ -91,6 +92,7 @@ export const AuthProvider = ({ children }) => {
             
             // Naya connection banayein
             socket = io('http://localhost:4000', { withCredentials: true });
+            setSocketVersion(prevVersion => prevVersion + 1);
 
             socket.on('connect', () => console.log(`✅ Socket connected for user: ${user.name}`));
 
@@ -127,7 +129,7 @@ export const AuthProvider = ({ children }) => {
     }, [user]); // Yeh effect `user` object par depend karta hai
 
     // Sabhi zaroori cheezein value prop se poori app ko do
-    const value = { user, isLoading, login, logout, fetchLoggedInUser, setUser };
+   const value = { user, isLoading, login, logout, fetchLoggedInUser, setUser, socketVersion };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
