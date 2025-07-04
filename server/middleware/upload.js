@@ -1,40 +1,60 @@
-import multer from 'multer';
-import path from 'path'; // Node.js ka built-in module for paths
+// ✅ PASTE THIS ENTIRE CODE IN YOUR MIDDLEWARE FILE (e.g., middlewares/upload.js or middlewares/multer.js)
 
-// Hum multer ko bol rahe hain ki file ko disk (server ki hard drive) par save karo.
-// Isse 'multer-storage-cloudinary' ki zaroorat nahi padegi.
-const storage = multer.diskStorage({
-    // Destination: file ko kahan save karna hai.
-    destination: (req, file, cb) => {
-        // 'temp/' naam ke folder mein save karo.
-        // Make sure to create this 'temp' folder in your server's root directory.
-        cb(null, 'temp/');
-    },
-    // Filename: server par temporary file ka naam kya rakhna hai.
-    // Hum ek unique naam banayenge taaki same naam ki do files ek dusre ko overwrite na karein.
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+
+// Step 1: Cloudinary Configuration
+// Yeh sunishchit karein ki aapke .env file mein ya Render ke Environment Variables mein ye values set hain.
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// File filter (Aapka pehle wala hi theek hai)
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|zip/;
-    // path.extname se file ka extension check karna zyada reliable hai.
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+// Step 2: Cloudinary Storage Engine
+// Yahan hum multer ko batate hain ki file ko seedhe Cloudinary par bhejna hai, disk par nahi.
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: (req, file) => {
+        // req object se zaroori data nikalenge taaki Cloudinary par folder structure sahi bane.
+        const { folderId } = req.params;
+        const { familyId } = req.user; // Ye user authentication middleware se aana chahiye.
 
-    if (mimetype && extname) {
-        return cb(null, true);
+        // File ke type ke hisaab se 'resource_type' set karenge. Ye PDF/DOCX ke liye 'raw' hona zaroori hai.
+        let resourceType = 'raw'; // Default for documents
+        if (file.mimetype.startsWith('image/')) {
+            resourceType = 'image';
+        } else if (file.mimetype.startsWith('video/')) {
+            resourceType = 'video';
+        }
+
+        // Ye object Cloudinary ko bheja jayega.
+        return {
+            folder: `family_dashboard/${familyId}/${folderId}`, // Dynamic folder path
+            resource_type: resourceType,
+            // (Optional) Hum original file naam ko public_id ke hisaab se set kar sakte hain, ya Cloudinary ko unique ID banane de sakte hain.
+            // public_id: file.originalname.split('.')[0] // Example: 'document' from 'document.pdf'
+        };
+    },
+});
+
+// Step 3: File Filter (Optional but Recommended)
+// Yahan hum define karte hain ki kaun se file types ko allow karna hai.
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'];
+    
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true); // File ko accept karo
     } else {
-        cb(new Error('Error: File format not supported!'), false);
+        // File ko reject karo aur ek error pass karo
+        cb(new Error('Unsupported file format! Please upload images, PDFs, or documents.'), false);
     }
 };
 
-// Multer middleware ko create karein
+// Step 4: Create the Multer Middleware
 const upload = multer({
-    storage: storage, // Yahan hum naya disk wala storage pass kar rahe hain.
+    storage: storage, // Yahan hum apna naya Cloudinary wala storage pass kar rahe hain.
     limits: { fileSize: 1024 * 1024 * 15 }, // 15 MB limit
     fileFilter: fileFilter,
 });
