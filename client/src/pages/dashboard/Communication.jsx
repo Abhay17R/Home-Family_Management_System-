@@ -230,7 +230,7 @@ const CommunicationHub = () => {
               <>
                 <div className="active-chat-header">
                   <h3>{activeChat.isGroupChat ? activeChat.chatName : activeChat.users.find(u => u._id !== currentUser._id)?.name}</h3>
-                  <div className="header-actions"><span><BellIcon /></span><div className="child-mode-indicator"><ShieldIcon /> Child Mode: ON</div></div>
+                  <div className="header-actions"><span><BellIcon /></span><div className="child-mode-indicator"><ShieldIcon /> RealTime</div></div>
                 </div>
                 <div className="messages-display">
                   {loading.messages ? <div className="loading-container"><h4>Loading Messages...</h4></div> : activeMessages.map(msg => {
