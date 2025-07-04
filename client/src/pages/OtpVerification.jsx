@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import API from '../api/axios'
 import { Navigate, useParams, useNavigate } from "react-router-dom"; // useNavigate ko import karein
 import { toast } from "react-toastify";
 import { useAuth } from "../hooks/useAuth.js"; // ✅ Step 1: Sahi hook import karein
@@ -48,8 +49,8 @@ const OtpVerification = () => {
     }
     const data = { email, otp: enteredOtp, phone };
     try {
-      const res = await axios.post(
-        "http://localhost:4000/api/v1/otp-verification",
+      const res = await API.post(
+        "otp-verification",
         data,
         {
           withCredentials: true,

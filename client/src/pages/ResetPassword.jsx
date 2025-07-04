@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import API from '../api/axios'
 import { Navigate, useParams, Link, useNavigate } from "react-router-dom"; // useNavigate import karein
 import { toast } from "react-toastify";
 import { useAuth } from "../hooks/useAuth.js"; // ✅ Step 1: Sahi hook import karein
@@ -26,8 +27,8 @@ const ResetPassword = () => {
     }
 
     try {
-      const res = await axios.put(
-        `http://localhost:4000/api/v1/password/reset/${token}`,
+      const res = await API.put(
+        `password/reset/${token}`,
         { password, confirmPassword },
         {
           withCredentials: true,

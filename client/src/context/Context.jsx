@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import API from "../api/axios";
 
 // 1. Context ko initialize karna default values ke saath
 // Isse aapke code ko testing me aur auto-completion me मदद milti hai.
@@ -30,7 +31,7 @@ export const ContextProvider = ({ children }) => {
       setIsLoading(true); // API call shuru hone se pehle loading true
       try {
         // Axios ko withCredentials ke saath call karein taaki cookie (token) jaaye
-        const { data } = await axios.get("http://localhost:4000/api/v1/me", {
+        const { data } = await API.get("me", {
           withCredentials: true,
         });
 

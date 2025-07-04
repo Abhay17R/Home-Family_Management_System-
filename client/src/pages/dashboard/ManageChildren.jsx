@@ -4,6 +4,7 @@ import axios from 'axios';
 // import React, { useState } from 'react';
 import '../../styles/Dashboard/ManageChildren.css';
 import { useAuth } from "../../hooks/useAuth"; // Is CSS file ko hum abhi banayenge
+import API from '../../api/axios'
 
 // --- DUMMY DATA ---
 // Jab aap backend se connect karenge, toh yeh data API se aayega.
@@ -23,7 +24,7 @@ const ManageChildren = () => {
     useEffect(()=>{
         const fetchChildren =async()=>{
             try {
-                const {data}=await axios.get('http://localhost:4000/api/v1/admin/my-children',
+                const {data}=await API.get('admin/my-children',
                     {withCredentials:true}
                 );
                 if(data.success) setChildren(data.children);
@@ -43,7 +44,7 @@ const ManageChildren = () => {
         // Confirmation dialog
         if (window.confirm('Are you sure you want to remove this profile? This action cannot be undone.')) {
             try {
-                await axios.delete(`http://localhost:4000/api/v1/admin/child/${childId}`,{
+                await API.delete(`admin/child/${childId}`,{
                     withCredentials:true
                 });
                 setChildren(prevChildren=>prevChildren.filter(child=>child._id!==childId));
@@ -66,8 +67,8 @@ const ManageChildren = () => {
       [field]: value
     };
 
-    await axios.put(
-      `http://localhost:4000/api/v1/admin/child/${childId}`,
+    await API.put(
+      `admin/child/${childId}`,
       { permissions: updatedPermissions }, // ✅ Send full object
       { withCredentials: true }
     );

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js"; // ✅ Step 1: Sahi hook import karein
 import "../styles/Auth.css"; // Styles import
+import API from "../api/axios";
 
 const ForgotPassword = () => {
   // ✅ Step 2: useAuth se 'user' object nikalein
@@ -18,8 +19,8 @@ const ForgotPassword = () => {
     e.preventDefault();
     try {
       // Yeh logic bilkul sahi hai aur ismein koi badlaav ki zaroorat nahi hai.
-      const res = await axios.post(
-        "http://localhost:4000/api/v1/password/forgot",
+      const res = await API.post(
+        "password/forgot",
         { email },
         {
           withCredentials: true,

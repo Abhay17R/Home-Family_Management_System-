@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/Dashboard/OtpChild.css'; // Is CSS file ko hum style karenge
+import API from '../../api/axios'
 
 const OtpChild = () => {
     // ✅ State ko 5-element ke array mein badal diya
@@ -55,8 +56,8 @@ const OtpChild = () => {
 
         try {
             // ✅ Axios call mein withCredentials add karna zaroori hai
-            const { data } = await axios.post(
-                'http://localhost:4000/api/v1/child/verify-otp', 
+            const { data } = await API.post(
+                'child/verify-otp', 
                 {
                     email: decodeURIComponent(email),
                     otp: enteredOtp, // Joda hua string bhejein

@@ -4,11 +4,14 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import { Folder, Plus, Upload, FileText, FileImage, File, Download, Trash2, X, Search, FileArchive, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import '../../styles/Dashboard/document.css';
+import API from '../../api/axios';
+
 
 // ✅ STEP 1: Global Context se 'useAppFocus' hook import karein
 import { useAppFocus } from '../../context/AppFocusContext';
 
-const API_URL = "http://localhost:4000/api/v1/documents";
+// const API_URL = "http://localhost:4000/api/v1/documents";
+const API_URL = import.meta.env.VITE_BACKEND_URL + '/api/v1/documents';
 
 // Yeh aapke default folders ka "Master List" hai
 const DEFAULT_FOLDERS = [
@@ -58,7 +61,7 @@ const FileManager = () => {
         setLoadingFolders(true);
         setError('');
         try {
-            const { data } = await axios.get(`${API_URL}/folders`, { withCredentials: true });
+            const { data } = await API.get(`${API_URL}/folders`, { withCredentials: true });
             const dbFolders = data.folders;
             const dbFoldersMap = new Map(dbFolders.map(f => [f.name, f]));
             const orderedDefaultFolders = DEFAULT_FOLDERS.map(defaultFolder => dbFoldersMap.get(defaultFolder.name) || defaultFolder);
@@ -83,7 +86,7 @@ const FileManager = () => {
         }
         setLoadingFiles(true); setError('');
         try {
-            const { data } = await axios.get(`${API_URL}/files/${selectedFolder._id}?search=${searchTerm}`, { withCredentials: true });
+            const { data } = await API.get(`${API_URL}/files/${selectedFolder._id}?search=${searchTerm}`, { withCredentials: true });
             setFiles(data.files);
         } catch (err) {
             setError('Could not fetch files.'); console.error(err);
@@ -107,14 +110,14 @@ const FileManager = () => {
     const handleCreateFolder = async (e) => {
         e.preventDefault(); if (newFolderName.trim() === '') return;
         try {
-            const { data: { folder: newFolder } } = await axios.post(`${API_URL}/folders`, { name: newFolderName }, { withCredentials: true });
+            const { data: { folder: newFolder } } = await API.post(`${API_URL}/folders`, { name: newFolderName }, { withCredentials: true });
             closeModal(); await fetchFolders(); setSelectedFolder(newFolder);
         } catch (err) { alert('Error creating folder: ' + (err.response?.data?.message || 'Server error')); }
     };
     const handleDeleteFolder = async (folderId, folderName) => {
         if (!window.confirm(`Are you sure you want to delete "${folderName}"? ALL files will be deleted.`)) return;
         try {
-            await axios.delete(`${API_URL}/folders/${folderId}`, { withCredentials: true });
+            await API.delete(`${API_URL}/folders/${folderId}`, { withCredentials: true });
             setSelectedFolder(null); fetchFolders();
             
         } catch (err) { alert('Could not delete folder: ' + (err.response?.data?.message || 'Server error')); }
@@ -123,7 +126,7 @@ const FileManager = () => {
         if (!selectedFolder) return;
         if (selectedFolder.isDefault && !selectedFolder._id) {
             try {
-                const { data } = await axios.post(`${API_URL}/folders`, { name: selectedFolder.name }, { withCredentials: true });
+                const { data } = await API.post(`${API_URL}/folders`, { name: selectedFolder.name }, { withCredentials: true });
                 const newDbFolder = data.folder;
                 setSelectedFolder(newDbFolder); setFolders(currentFolders => currentFolders.map(f => f.name === newDbFolder.name ? newDbFolder : f));
                 openModal('upload');
@@ -136,14 +139,14 @@ const FileManager = () => {
         const formData = new FormData(); formData.append('file', fileToUpload);
         setUploading(true);
         try {
-            await axios.post(`${API_URL}/files/${selectedFolder._id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true, });
+            await API.post(`${API_URL}/files/${selectedFolder._id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true, });
             closeModal(); await fetchFiles();
         } catch (err) { alert('Upload failed: ' + (err.response?.data?.message || 'Server error')); } finally { setUploading(false); }
     };
     const handleDeleteFile = async (fileId) => {
         if (!window.confirm('Are you sure you want to delete this file?')) return;
         try {
-            await axios.delete(`${API_URL}/files/${fileId}`, { withCredentials: true });
+            await API.delete(`${API_URL}/files/${fileId}`, { withCredentials: true });
             setFiles(prevFiles => prevFiles.filter(f => f._id !== fileId));
         } catch (err) { alert('Could not delete file: ' + (err.response?.data?.message || 'Server error')); }
     };

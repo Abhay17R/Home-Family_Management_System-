@@ -4,6 +4,7 @@ import React, { StrictMode, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import axios from "axios";
+import API from './api/axios'
 
 // ✅ NAYA AUR SAHI IMPORT PATH (Aapke file structure ke hisaab se)
 import { Context } from "./context/Context.jsx";
@@ -27,7 +28,7 @@ const AppWrapper = () => {
     const fetchUserStatus = async () => {
       try {
         // Backend ke "/me" route ko call karke user ki details maango
-        const { data } = await axios.get("http://localhost:4000/api/v1/me", {
+        const { data } = await API.get("me", {
           withCredentials: true, // Cookie ko request ke saath bhejega
         });
         

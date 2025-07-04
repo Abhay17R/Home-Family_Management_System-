@@ -3,9 +3,11 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import API from "../api/axios"
 
 // 1. Context banaya
 export const AuthContext = createContext();
+const BACKEND_URLL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 //  export let socket = null;
 
 // 2. Socket instance ko context ke bahar rakhein taaki re-renders par reset na ho
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     // Yeh function Login component se call hoga
     const login = async (email, password) => {
         try {
-            const { data } = await axios.post('http://localhost:4000/api/v1/login', { email, password }, {
+            const { data } = await API.post('login', { email, password }, {
                 withCredentials: true,
             });
 
@@ -59,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     // Yeh function real-time update ke liye istemal hoga
     const fetchLoggedInUser = async () => {
         try {
-            const { data } = await axios.get('http://localhost:4000/api/v1/me', { withCredentials: true });
+            const { data } = await API.get('me', { withCredentials: true });
             if (data.success) {
                 setUser(data.user);
             } else {
@@ -91,7 +93,7 @@ export const AuthProvider = ({ children }) => {
             if (socket) socket.disconnect();
             
             // Naya connection banayein
-            socket = io('http://localhost:4000', { withCredentials: true });
+            socket = io(BACKEND_URLL, { withCredentials: true });
             setSocketVersion(prevVersion => prevVersion + 1);
 
             socket.on('connect', () => console.log(`✅ Socket connected for user: ${user.name}`));

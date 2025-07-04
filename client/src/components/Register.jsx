@@ -5,7 +5,8 @@ import { Context } from "../context/Context.jsx";
 
 // import { Context } from "./context/Context.jsx";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import API from "../api/axios"
 import { toast } from "react-toastify";
 
 const countryCodes = [
@@ -31,8 +32,8 @@ const Register = ({ setIsLogin }) => {
     data.phone = `${data.countryCode}${data.phone}`;
 
     try {
-      const res = await axios.post(
-        "http://localhost:4000/api/v1/register",
+      const res = await API.post(
+        "register",
         data,
         {
           withCredentials: true,

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ Step 1: Import useNavigate
-import axios from 'axios'; // ✅ Behtar handling ke liye axios ka istemal
+// import axios from 'axios'; // ✅ Behtar handling ke liye axios ka istemal
 import '../../styles/Dashboard/AddChild.css';
+
+import API from '../../api/axios';
 
 // SVG Icon component - No changes here
 const UploadIcon = () => (
@@ -83,8 +85,8 @@ const AddChild = () => {
 
         try {
             // Axios ka istemal karke API call
-            const { data } = await axios.post(
-                'http://localhost:4000/api/v1/admin/create-child',
+            const { data } = await API.post(
+                'admin/create-child',
                 payload,
                 { withCredentials: true } // Cookies bhejne ke liye zaroori
             );

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useAuth } from './useAuth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import API from '../api/axios';
 export const useLogout = () => {
     const { setUser } = useAuth();
     const navigate = useNavigate(); // ✅ Make sure this is here
@@ -12,7 +12,7 @@ export const useLogout = () => {
     const logout = async () => {
         try {
             // Backend se cookie clear karwayein
-            await axios.get('http://localhost:4000/api/v1/logout', {
+            await API.get('logout', {
                 withCredentials: true,
             });
             

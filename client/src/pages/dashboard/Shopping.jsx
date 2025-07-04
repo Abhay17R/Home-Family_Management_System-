@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../styles/Dashboard/Shopping.css';
+import API from '../../api/axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSearch, faCalendarAlt, faReceipt, faRupeeSign, faTrashAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -44,7 +45,7 @@ const ShoppingAndOrders = () => {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:4000/api/v1/orders?search=${searchTerm}`, { withCredentials: true });
+            const response = await API.get(`orders?search=${searchTerm}`, { withCredentials: true });
             setOrders(response.data.orders);
             setError(null);
         } catch (err) {
@@ -67,9 +68,9 @@ const ShoppingAndOrders = () => {
         const action = modalMode === 'add' ? 'add' : 'update';
         try {
             if (modalMode === 'add') {
-                await axios.post('http://localhost:4000/api/v1/orders', orderData, { withCredentials: true });
+                await API.post('orders', orderData, { withCredentials: true });
             } else {
-                await axios.put(`http://localhost:4000/api/v1/orders/${currentOrder._id}`, orderData, { withCredentials: true });
+                await API.put(`orders/${currentOrder._id}`, orderData, { withCredentials: true });
             }
             closeModal();
             fetchOrders();
@@ -81,7 +82,7 @@ const ShoppingAndOrders = () => {
     const handleCancelOrder = async (orderId) => {
         if (window.confirm("Are you sure you want to cancel this order?")) { // English Message
             try {
-                await axios.put(`http://localhost:4000/api/v1/orders/${orderId}`, { status: 'Cancelled' }, { withCredentials: true });
+                await API.put(`orders/${orderId}`, { status: 'Cancelled' }, { withCredentials: true });
                 fetchOrders();
             } catch (err) {
                 alert("Failed to cancel the order."); // English Message
@@ -92,7 +93,7 @@ const ShoppingAndOrders = () => {
     const handleDeleteOrder = async (orderId) => {
         if (window.confirm("Are you sure you want to permanently delete this order? This cannot be undone.")) { // English Message
             try {
-                await axios.delete(`http://localhost:4000/api/v1/orders/${orderId}`, { withCredentials: true });
+                await API.delete(`orders/${orderId}`, { withCredentials: true });
                 fetchOrders();
             } catch (err) {
                 alert("Failed to delete the order."); // English Message
