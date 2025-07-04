@@ -67,8 +67,8 @@ const OtpChild = () => {
                 }
             );
 
-            alert(data.message || 'Verification successful! Child profile created.');
-            navigate('/dashboard/manage-children');
+            alert( 'Verification successful! Member profile created.');
+            navigate('/dashboard/manage-members');
 
         } catch (err) {
             setError(err.response?.data?.message || 'Invalid OTP or an error occurred.');
@@ -82,7 +82,7 @@ const OtpChild = () => {
         <div className="otp-child-container">
             <div className="otp-card">
                 <div className="otp-header">
-                    <h2>Verify Your Child's Email</h2>
+                    <h2>Verify Your Member's Email</h2>
                     <p>An OTP has been sent to the email address:</p>
                     <strong className="email-display">{decodeURIComponent(email)}</strong>
                 </div>

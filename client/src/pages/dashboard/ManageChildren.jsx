@@ -102,12 +102,12 @@ const ManageChildren = () => {
         <div className="manage-children-container">
             <div className="page-header">
                 <div>
-                    <h2>Manage Child Profiles</h2>
-                    <p>View, edit, or remove child profiles from your family dashboard.</p>
+                    <h2>Manage Member Profiles</h2>
+                    <p>View, edit, or remove member profiles from your family dashboard.</p>
                 </div>
-                <Link to="/dashboard/add-child" className="btn btn-primary add-child-btn">
+                <Link to="/dashboard/add-member" className="btn btn-primary add-child-btn">
                     <AddIcon />
-                    <span>Add New Child</span>
+                    <span>Add New Member</span>
                 </Link>
             </div>
 
@@ -164,14 +164,16 @@ const ManageChildren = () => {
                                 <span>Remove</span>
                             </button>
                         </div>
+
+                        
                     </div>
                 ))}
             </div>
             
             {children.length === 0 && !loading && (
                 <div className="no-children-found">
-                    <h3>No child profiles found.</h3>
-                    <p>Click on "Add New Child" to create a new profile.</p>
+                    <h3>No memeber profiles found.</h3>
+                    <p>Click on "Add New Memeber" to create a new profile.</p>
                 </div>
             )}
         </div>

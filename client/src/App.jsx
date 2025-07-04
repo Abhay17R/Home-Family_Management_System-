@@ -112,9 +112,9 @@ if (isLoading) {
           <Route path="location" element={<LocationDashboard />} />
           <Route path="reports" element={<AnalyticsDashboard />} />
           <Route path="security" element={<SecuritySettings />} />
-          <Route path="add-child" element={<AddChild />} />
+          <Route path="add-member" element={<AddChild />} />
           <Route path="documents" element={<FileManager />} />
-          <Route path="manage-children" element={<ManageChildren />} />
+          <Route path="manage-members" element={<ManageChildren />} />
           <Route path="otp-child/:email" element={<OtpChild />} />
         </Route>
 

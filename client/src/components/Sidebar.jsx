@@ -41,8 +41,8 @@ const menuItems = [
 
 const adminSpecificItems = [
     { heading: 'Admin Controls' },
-    { name: 'Manage Children', path: '/dashboard/manage-children', role: ['admin'] },
-    { name: 'Add New Child', path: '/dashboard/add-child', role: ['admin'] },
+    { name: 'Manage Members', path: '/dashboard/manage-members', role: ['admin'] },
+    { name: 'Add New Member', path: '/dashboard/add-member', role: ['admin'] },
 ];
 
 const Sidebar = () => {

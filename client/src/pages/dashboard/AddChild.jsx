@@ -92,13 +92,14 @@ const AddChild = () => {
             );
 
             // ✅ Step 3: Success hone par navigate karein
-            alert(data.message || 'Child profile created! Redirecting to OTP page...');
+            alert( "Family member profile created! Redirecting to OTP page...");
             
             // User ko OTP page par bhej dein
             navigate(`/dashboard/otp-child/${encodeURIComponent(payload.email)}`);
 
         } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Failed to create child profile.';
+            const errorMessage = err.response?.data?.message || "Failed to create member's profile."
+            ;
             setError(errorMessage);
             alert(`Error: ${errorMessage}`);
             console.error('Form Submission Error:', err);
@@ -110,8 +111,8 @@ const AddChild = () => {
     return (
         <div className="add-child-container">
             <div className="form-header">
-                <h2>Add a New Child Profile</h2>
-                <p>Fill in the details below to create a new profile for your child in the family dashboard.</p>
+                <h2>Add a New Member Profile</h2>
+                <p>Fill in the details below to create a new family member profile in the dashboard.</p>
             </div>
 
             <div className="form-card">
