@@ -5,7 +5,7 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Main page ko scroll hone se rokein */
+  /* overflow: hidden; Main page ko scroll hone se rokein */
 }
 
 /* ---- General Hub Layout ---- */
