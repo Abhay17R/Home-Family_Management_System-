@@ -7,10 +7,10 @@ import {
     getChatMessages,
     sendMessage,
     createPoll,
-    getFamilyPolls,   // 'getChatPolls' ki jagah 'getFamilyPolls' use karo
+    getFamilyPolls,
+    getPollDetails, // Add this import
     voteInPoll,
     addPinnedNote,
-    //  markChatAsRead,
 } from "../controllers/communicationController.js";
 
 const router = express.Router();
@@ -21,10 +21,10 @@ router.route("/messages/:chatId").get(protect, getChatMessages);
 router.route("/messages").post(protect, sendMessage);
 
 // --- Poll Routes (Global for Family) ---
-router.route("/polls").get(protect, getFamilyPolls); // Route: GET /api/v1/communication/polls
-router.route("/polls").post(protect, createPoll);    // Route: POST /api/v1/communication/polls
-router.route("/polls/vote/:pollId").post(protect, voteInPoll); // Route for voting
-// router.route('/chats/:chatId/read').post(protect, markChatAsRead);
+router.route("/polls").get(protect, getFamilyPolls);
+router.route("/polls").post(protect, createPoll);
+router.route("/polls/:pollId").get(protect, getPollDetails); // Add this route
+router.route("/polls/vote/:pollId").post(protect, voteInPoll);
 
 // --- Pinned Note Routes (Chat-specific) ---
 router.route("/pins/:chatId").post(protect, addPinnedNote);

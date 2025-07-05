@@ -4,40 +4,87 @@ import Poll from "../models/pollModel.js";
 import { User } from "../models/userModel.js";
 import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import { getSocketServerInstance } from "../socket/socket.js";
+import mongoose from 'mongoose';
 
 // @desc    Fetch chats, including a guaranteed family group and virtual 1-on-1 chats
 export const getMyChats = catchAsyncError(async (req, res, next) => {
     const loggedInUser = req.user;
     if (!loggedInUser.familyId) return res.status(200).json({ success: true, chats: [] });
 
-    const familyMembers = await User.find({ familyId: loggedInUser.familyId, _id: { $ne: loggedInUser._id } }).select("name email avatar createdAt");
+    // Get all family members including the current user
+    const allFamilyMembers = await User.find({ familyId: loggedInUser.familyId }).select("name email avatar createdAt");
+    const allFamilyMemberIds = allFamilyMembers.map(u => u._id);
 
-    let familyGroupChat = await Chat.findOne({ isGroupChat: true, "customProperties.familyId": loggedInUser.familyId });
+    // Try to find the family group chat by custom property OR by being a group with all family members
+    let familyGroupChat = await Chat.findOne({ 
+        isGroupChat: true,
+        $or: [
+            { "customProperties.familyId": loggedInUser.familyId },
+            { users: { $all: allFamilyMemberIds, $size: allFamilyMemberIds.length } }
+        ]
+    });
 
+    // If still not found, create a new one
     if (!familyGroupChat) {
-        const allFamilyMemberIds = (await User.find({ familyId: loggedInUser.familyId }).select("_id")).map(u => u._id);
         familyGroupChat = await Chat.create({
-            chatName: "Family Group", isGroupChat: true, users: allFamilyMemberIds, groupAdmin: loggedInUser._id,
+            chatName: "Family Group",
+            isGroupChat: true,
+            users: allFamilyMemberIds,
+            groupAdmin: loggedInUser._id,
             customProperties: { familyId: loggedInUser.familyId }
         });
     }
 
+    // Populate the family group chat
     familyGroupChat = await Chat.findById(familyGroupChat._id)
         .populate("users", "-password")
-        .populate({ path: 'latestMessage', populate: { path: 'sender', select: 'name avatar' } });
+        .populate({ 
+            path: 'latestMessage',
+            populate: { 
+                path: 'sender', 
+                select: 'name avatar' 
+            } 
+        });
 
-    const oneOnOneChatsPromises = familyMembers.map(async (member) => {
-        let chat = await Chat.findOne({ isGroupChat: false, users: { $all: [loggedInUser._id, member._id], $size: 2 }})
-            .populate("users", "-password")
-            .populate({ path: 'latestMessage', populate: { path: 'sender', select: 'name avatar' } });
-        if (chat) return chat;
+    // Now, create virtual 1-on-1 chats for other family members (excluding the current user)
+    const otherMembers = allFamilyMembers.filter(member => !member._id.equals(loggedInUser._id));
+    const oneOnOneChatsPromises = otherMembers.map(async (member) => {
+        // Try to find an existing 1-on-1 chat
+        let chat = await Chat.findOne({
+            isGroupChat: false,
+            users: { $all: [loggedInUser._id, member._id], $size: 2 }
+        })
+        .populate("users", "-password")
+        .populate({ 
+            path: 'latestMessage',
+            populate: { 
+                path: 'sender', 
+                select: 'name avatar' 
+            } 
+        });
+
+        if (chat) {
+            return chat;
+        }
+
+        // If no existing chat, create a virtual one (not saved in DB)
         return {
-            _id: `virtual-${member._id}`, isVirtual: true, isGroupChat: false, users: [loggedInUser.toObject(), member.toObject()],
-            chatName: member.name, latestMessage: null, createdAt: member.createdAt, updatedAt: member.createdAt
+            _id: `virtual-${member._id}`,
+            isVirtual: true,
+            isGroupChat: false,
+            users: [loggedInUser.toObject(), member.toObject()],
+            chatName: member.name,
+            latestMessage: null,
+            createdAt: member.createdAt,
+            updatedAt: member.createdAt
         };
     });
+
     const oneOnOneChats = await Promise.all(oneOnOneChatsPromises);
+
+    // Combine the group chat and the 1-on-1 chats, then sort by update time
     const allChats = [familyGroupChat, ...oneOnOneChats].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
     res.status(200).json({ success: true, chats: allChats });
 });
 
@@ -66,7 +113,7 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
         }
     }
     if (!content || !targetChatId) return res.status(400).json({ message: "Invalid data." });
-    const message = await Message.create({ sender: req.user._id, content: content, chat: targetChatId,familyId: req.user.familyId });
+    const message = await Message.create({ sender: req.user._id, content: content, chat: targetChatId, familyId: req.user.familyId });
     const populatedMessage = await message.populate([{ path: "sender", select: "name avatar" }, { path: "chat", populate: { path: "users", select: "name email avatar" } }]);
     await Chat.findByIdAndUpdate(targetChatId, { latestMessage: populatedMessage._id });
     const io = getSocketServerInstance();
@@ -80,11 +127,28 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
 // --- POLL CONTROLLERS ---
 export const createPoll = catchAsyncError(async (req, res, next) => {
     const { question, options } = req.body;
-    if (!question || !options || !Array.isArray(options) || options.length < 2) return res.status(400).json({ message: "Question and at least 2 options required." });
-    const pollOptions = options.map(opt => ({ text: opt, votes: [] }));
-    const poll = await Poll.create({ question, options: pollOptions, familyId: req.user.familyId, createdBy: req.user._id });
+    
+    // Trim and validate options
+    const validOptions = options
+        .map(opt => opt.trim())
+        .filter(opt => opt !== '');
+    
+    if (!question || validOptions.length < 2) {
+        return res.status(400).json({ message: "Question and at least 2 non-empty options required." });
+    }
+    
+    const pollOptions = validOptions.map(opt => ({ text: opt, votes: [] }));
+    
+    const poll = await Poll.create({ 
+        question, 
+        options: pollOptions, 
+        familyId: req.user.familyId, 
+        createdBy: req.user._id 
+    });
+    
     const populatedPoll = await poll.populate("createdBy", "name avatar");
     const io = getSocketServerInstance();
+    
     if(req.user.familyId) io.to(req.user.familyId).emit('new_poll', populatedPoll);
     res.status(201).json({ success: true, poll: populatedPoll });
 });
@@ -95,7 +159,34 @@ export const getFamilyPolls = catchAsyncError(async (req, res, next) => {
     res.status(200).json({ success: true, polls });
 });
 
-// @desc    Vote in a poll (IMPLEMENTED)
+// @desc    Get detailed poll information with voters
+// Get detailed poll information
+export const getPollDetails = catchAsyncError(async (req, res, next) => {
+    const { pollId } = req.params;
+    
+    // Validate poll ID format
+    if (!mongoose.Types.ObjectId.isValid(pollId)) {
+        return res.status(400).json({ message: "Invalid poll ID format" });
+    }
+    
+    const poll = await Poll.findById(pollId)
+        .populate('createdBy', 'name avatar')
+        .populate('options.votes', 'name avatar');
+    
+    if (!poll) {
+        return res.status(404).json({ message: "Poll not found" });
+    }
+    
+    // Verify poll belongs to user's family
+    if (poll.familyId !== req.user.familyId) {
+        return res.status(403).json({ message: "You don't have permission to view this poll" });
+    }
+    
+    res.status(200).json({ success: true, poll });
+});
+
+
+// @desc    Vote in a poll or change vote
 export const voteInPoll = catchAsyncError(async (req, res, next) => {
     const { optionId } = req.body;
     const { pollId } = req.params;
@@ -106,21 +197,21 @@ export const voteInPoll = catchAsyncError(async (req, res, next) => {
     const poll = await Poll.findById(pollId);
     if (!poll) return res.status(404).json({ message: "Poll not found." });
     
-    // Remove user's previous vote from all options to ensure they only vote once
+    // Remove user's vote from all options first
     poll.options.forEach(option => {
         option.votes.pull(userId);
     });
     
-    // Add user's new vote to the selected option
+    // Add vote to the selected option
     const optionToVote = poll.options.id(optionId);
     if (!optionToVote) return res.status(404).json({ message: "Option not found in this poll." });
     
     optionToVote.votes.push(userId);
-    
     await poll.save();
     
-    // Populate the updated poll to send back to clients
-    const updatedPoll = await Poll.findById(pollId).populate('createdBy', 'name avatar').populate('options.votes', 'name avatar');
+    const updatedPoll = await Poll.findById(pollId)
+        .populate('createdBy', 'name avatar')
+        .populate('options.votes', 'name avatar');
     
     const io = getSocketServerInstance();
     if(req.user.familyId) io.to(req.user.familyId).emit('poll_updated', updatedPoll);
@@ -139,17 +230,14 @@ export const addPinnedNote = catchAsyncError(async (req, res, next) => {
     io.to(req.user.familyId).emit('pinned_notes_updated', { chatId: chatId, pinnedNotes: chat.pinnedNotes });
     res.status(200).json({ success: true, pinnedNotes: chat.pinnedNotes });
 });
-// controllers/communicationController.js
 
 export const markChatAsRead = catchAsyncError(async (req, res, next) => {
     const { _id: userId } = req.user;
     const { chatId } = req.params;
 
-    // Us chat ke saare messages ko update karo jinko user ne abhi tak nahi padha hai.
-    // $addToSet operator user ki ID ko 'readBy' array me daal dega, lekin sirf tab agar woh pehle se usme na ho.
     await Message.updateMany(
-        { chat: chatId, readBy: { $ne: userId } }, // Condition: Is chat ke woh messages jinko user ne nahi padha
-        { $addToSet: { readBy: userId } }         // Action: User ki ID ko readBy array me daal do
+        { chat: chatId, readBy: { $ne: userId } },
+        { $addToSet: { readBy: userId } }
     );
 
     res.status(200).json({
