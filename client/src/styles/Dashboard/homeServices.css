@@ -1,0 +1,111 @@
+/* src/components/HomeServices.css */
+
+.home-services-container {
+  padding: 40px 20px;
+  background-color: #f8f9fa; /* Ek light background, tere main area se alag dikhega */
+  text-align: center;
+  font-family: 'Poppins', sans-serif; /* Ek accha sa professional font */
+  border-radius: 8px;
+  color: #333;
+}
+
+.services-header h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #2c3e50; /* Tere dashboard ke dark color se match karta hua */
+}
+
+.services-header p {
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto 40px auto;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Ye grid responsive design ka magic hai */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.service-card {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
+}
+
+.service-card i {
+  font-size: 3rem; /* Icon ka size */
+  color: #3498db; /* Ek accha sa brand color */
+  margin-bottom: 15px;
+}
+
+.service-card h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.cta-section {
+  margin-top: 50px;
+}
+
+.cta-section p {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.cta-button {
+  display: inline-block;
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  color: #ffffff;
+  padding: 15px 35px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 50px; /* Pill shape button */
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.6);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .services-header h2 {
+    font-size: 2rem;
+  }
+  .services-header p {
+    font-size: 1rem;
+  }
+  .services-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+  }
+  .cta-button {
+    padding: 12px 28px;
+    font-size: 1rem;
+  }
+}

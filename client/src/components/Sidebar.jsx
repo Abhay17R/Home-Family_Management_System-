@@ -43,7 +43,10 @@ const adminSpecificItems = [
     { heading: 'Admin Controls' },
     { name: 'Manage Members', path: '/dashboard/manage-members', role: ['admin'] },
     { name: 'Add New Member', path: '/dashboard/add-member', role: ['admin'] },
+    { name: 'Home Services', path: '/dashboard/home-service', role: ['admin'] },
+    
 ];
+
 
 const Sidebar = () => {
     const navigate = useNavigate();

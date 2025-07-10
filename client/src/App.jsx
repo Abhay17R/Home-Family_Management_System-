@@ -7,6 +7,7 @@ import {  useAuth } from './hooks/useAuth.js'; // Sahi jagah se import
 import { AuthProvider } from "./context/AuthContext.jsx";
 
 // Components & Pages
+
 import Intro from "./pages/intro";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
@@ -29,6 +30,7 @@ import EmergencyAlertSystem from "./pages/dashboard/Emergency.jsx";
 import OtpChild from "./pages/dashboard/OtpChild";
 import ShoppingAndOrders from "./pages/dashboard/Shopping.jsx"
 import { AppFocusProvider } from './context/AppFocusContext.jsx';
+import HomeService from './pages/dashboard/homeservice.jsx';
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -116,6 +118,7 @@ if (isLoading) {
           <Route path="documents" element={<FileManager />} />
           <Route path="manage-members" element={<ManageChildren />} />
           <Route path="otp-child/:email" element={<OtpChild />} />
+          <Route path="home-service" element={<HomeService />} />
         </Route>
 
       </Routes>
