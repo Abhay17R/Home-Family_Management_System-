@@ -10,6 +10,7 @@ export const sendToken = async (user, statusCode, message, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // HTTPS ke liye
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    partitioned:true,
   };
 
   res
