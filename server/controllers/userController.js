@@ -19,7 +19,7 @@ const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 
 export const register = catchAsyncError(async (req, res, next) => {
   const { name, email, phone, password, verificationMethod, role = "child", parentId, familyId } = req.body;
-
+  console.log(req.body);
   if (!name || !email || !phone || !password || !verificationMethod) {
     return next(new ErrorHandler("All fields are required.", 400));
   }

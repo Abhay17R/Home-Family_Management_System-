@@ -43,7 +43,8 @@ const Register = ({ setIsLogin }) => {
       toast.success(res.data.message);
       navigateTo(`/otp-verification/${data.email}/${data.phone}`);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed");
+      // toast.error(error.response?.data?.message || "Registration failed");
+      console.log(error);
     }
   };
 
@@ -61,7 +62,7 @@ const Register = ({ setIsLogin }) => {
       </div>
 
       <div>
-        <input
+        <inputzz
           type="email"
           placeholder="Email Address"
           {...register("email", { required: "Email is required." })}
