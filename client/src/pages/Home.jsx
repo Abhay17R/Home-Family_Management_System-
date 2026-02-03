@@ -1,38 +1,60 @@
-// src/components/Home.jsx (ya jahan bhi aapki file hai)
-
 import React from "react";
-import "../styles/Home.css";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth.js";     // ✅ Step 1: useAuth hook import karein
-import { useLogout } from "../hooks/useLogout.js"; // ✅ Step 2: useLogout hook import karein
+import "../styles/Home.css"; // Dashboard ki style
+import "../pages/intro.css"; // Landing page ki style (agar alag hai to)
+import { Link } from "react-router-dom"; // Login button ke link ke liye
+import { useAuth } from "../hooks/useAuth.js";
+import { useLogout } from "../hooks/useLogout.js";
 
 const Home = () => {
-  // Step 3: Apne custom hooks se zaroori cheezein nikal lein
-  const { user } = useAuth(); // Hum yahan 'user' se check karenge, 'isAuthenticated' se nahi
-  const { logout } = useLogout(); // Poora logout logic ab is hook ke andar hai
+  const { user } = useAuth(); 
+  const { logout } = useLogout();
 
-  // Step 4: Authentication check karein
-  // Agar user object nahi hai, to use login/auth page par bhej do
-  if (!user) {
-    return <Navigate to={"/auth"} replace />;
-  }
-
-  // Agar user hai, to "Welcome" message aur logout button dikhayein
-  return (
-    <>
-      <section className="home">
-        {/* User ka naam dikhane ke liye aap user.name ya user.firstName use kar sakte hain */}
-        <h1>Welcome, {user.firstName || user.name}!</h1>
+  // ---------------------------------------------------------
+  // SCENARIO 1: USER LOGGED IN HAI 
+  // ---------------------------------------------------------
+  if (user) {
+    return (
+      <section className="home-dashboard">
+        <h1>Welcome Back, {user.firstName || user.name}!</h1>
+        <p>You are successfully logged in.</p>
         
-        {/* 'logout' function ab seedha hook se aa raha hai */}
         <button className="logout-button" onClick={logout}>
           Logout
         </button>
       </section>
-      
-      {/* Footer yahan reh sakta hai agar zaroori hai */}
-      {/* <Footer /> */}
-    </>
+    );
+  }
+
+  // ---------------------------------------------------------
+  // SCENARIO 2: USER NOT LOGGED
+  //  "Static Page"
+  // ---------------------------------------------------------
+  return (
+    <div className="landing-page-container">
+      {/* NAVBAR */}
+      <nav className="navbar">
+        <h1 className="logo">HOME</h1>
+        <div className="nav-buttons">
+            {/* Ye button user ko login page par le jayega jab wo chahega */}
+            <Link to="/auth">
+                <button className="btn-login">Login</button>
+            </Link>
+            <button className="btn-about">About Us</button>
+        </div>
+      </nav>
+
+      {/* HERO SECTION (Jo screenshot me tha) */}
+      <div className="hero-section">
+        <h1>Welcome to <span className="highlight">HOME</span></h1>
+        <p>
+          Organize your family life smartly: Track expenses, education,
+          tasks, and much more.
+        </p>
+        <Link to="/auth">
+            <button className="explore-btn">Explore Features ↓</button>
+        </Link>
+      </div>
+    </div>
   );
 };
 
