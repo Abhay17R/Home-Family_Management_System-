@@ -62,7 +62,7 @@ const Register = ({ setIsLogin }) => {
       </div>
 
       <div>
-        <inputzz
+        <input
           type="email"
           placeholder="Email Address"
           {...register("email", { required: "Email is required." })}
