@@ -16,7 +16,7 @@ const AppWrapper = () => {
   const [theme, setTheme] = useState("dark");
   
   // Loading state taaki page refresh par UI flash na kare
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   // Theme badalne wala function
   const toggleTheme = () => {
@@ -48,9 +48,9 @@ const AppWrapper = () => {
   }, []); // [] ka matlab ye sirf ek baar chalega jab app shuru hogi
 
   // Jab tak loading true hai, tab tak poori App ko rok ke rakho
-  if (loading) {
-    return <div>Loading...</div>; // Yahan aap ek fancy spinner bhi laga sakte hain
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>; // Yahan aap ek fancy spinner bhi laga sakte hain
+  // }
 
   // Jab loading poori ho jaaye, tab App dikhao
   return (

@@ -71,9 +71,9 @@ const AppRoutes = () => {
 
 
 // ✅ Initial loading state handle karna bilkul sahi hai
-if (isLoading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
-}
+// if (isLoading) {
+//     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+// }
   return (
     // Note: Theme ke liye aapko 'user' object se theme nikalni hogi,
     // ya koi alag context use karna hoga. Abhi ke liye aasan rakhte hain.

@@ -1,29 +1,40 @@
 // src/components/Login.jsx
 
-import React from "react";
+import React, { useState } from "react"; // useState add kiya
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 
 const Login = ({ setIsLogin }) => {
-    // Context se sirf 'login' function nikalo
     const { login } = useAuth();
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { isSubmitting } } = useForm();
+    
+    // Naya state server wake-up check karne ke liye
+    const [isWakingUpServer, setIsWakingUpServer] = useState(false);
 
-    // Form submit hone par yeh function chalega
     const handleLogin = async (formData) => {
-        // Context me banaya gaya login function call karo
-        const result = await login(formData.email, formData.password);
+        // Agar 4 second tak response na aaye, toh message badal do
+        const timeoutId = setTimeout(() => {
+            setIsWakingUpServer(true);
+        }, 4000);
 
-        // Result ke hisaab se toast dikhao aur redirect karo
-        if (result.success) {
-            toast.success(result.message || "Logged in successfully!");
-             await fetchLoggedInUser();
-            navigate('/dashboard', { replace: true });
-        } else {
-            toast.error(result.message);
+        try {
+            const result = await login(formData.email, formData.password);
+
+            if (result.success) {
+                toast.success(result.message || "Logged in successfully!");
+                // Agar aapka fetchLoggedInUser yahan hai toh call karein, warna useAuth context handle kar lega
+                // await fetchLoggedInUser(); 
+                navigate('/dashboard', { replace: true });
+            } else {
+                toast.error(result.message);
+            }
+        } finally {
+            // Request poori hote hi timer hata do aur state reset kar do
+            clearTimeout(timeoutId);
+            setIsWakingUpServer(false);
         }
     };
 
@@ -44,9 +55,14 @@ const Login = ({ setIsLogin }) => {
                     {...register("password", { required: "Password is required" })} 
                 />
             </div>
+            
+            {/* Yahan Smart Button Logic lagaya hai */}
             <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Logging in..." : "Login"}
+                {isSubmitting 
+                    ? (isWakingUpServer ? "Backend is connecting, please wait (up to 30s)..." : "Logging in...") 
+                    : "Login"}
             </button>
+            
             <div className="bottom-links">
                 <p>
                     Don't have an account?{" "}

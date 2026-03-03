@@ -1,11 +1,7 @@
-import React, { useContext } from "react";
+import React, { useState } from "react"; // useState add kiya
 import { useForm } from "react-hook-form";
-// import { Context } from "../main";
 import { Context } from "../context/Context.jsx"; 
-
-// import { Context } from "./context/Context.jsx";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios";
 import API from "../api/axios"
 import { toast } from "react-toastify";
 
@@ -19,17 +15,26 @@ const countryCodes = [
 ];
 
 const Register = ({ setIsLogin }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  // isSubmitting nikala react-hook-form se
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       verificationMethod: "email",
       countryCode: "+91",
-      role: "admin" // default role
+      role: "admin" 
     }
   });
   const navigateTo = useNavigate();
+  
+  // Wake-up check state
+  const [isWakingUpServer, setIsWakingUpServer] = useState(false);
 
   const handleRegister = async (data) => {
     data.phone = `${data.countryCode}${data.phone}`;
+
+    // Timer start karo
+    const timeoutId = setTimeout(() => {
+        setIsWakingUpServer(true);
+    }, 4000);
 
     try {
       const res = await API.post(
@@ -43,8 +48,13 @@ const Register = ({ setIsLogin }) => {
       toast.success(res.data.message);
       navigateTo(`/otp-verification/${data.email}/${data.phone}`);
     } catch (error) {
-      // toast.error(error.response?.data?.message || "Registration failed");
       console.log(error);
+      // Optional: Error toast dikha sakte ho yahan
+      // toast.error("Registration failed. Please try again.");
+    } finally {
+      // Clear timeout and reset state
+      clearTimeout(timeoutId);
+      setIsWakingUpServer(false);
     }
   };
 
@@ -88,7 +98,6 @@ const Register = ({ setIsLogin }) => {
         <p className="error-message">Please provide a valid phone number.</p>
       )}
 
-      {/* Hidden role input */}
       <input type="hidden" value="user" {...register("role")} />
 
       <div>
@@ -123,8 +132,11 @@ const Register = ({ setIsLogin }) => {
         </div>
       </div>
 
-      <button type="submit" className="btn-register-submit">
-        Register
+      {/* Smart Loading Button */}
+      <button type="submit" className="btn-register-submit" disabled={isSubmitting}>
+         {isSubmitting 
+            ? (isWakingUpServer ? "Backend is connecting, please wait (up to 30s)..." : "Registering...") 
+            : "Register"}
       </button>
 
       <div className="bottom-links">
