@@ -4,9 +4,8 @@ import React, { StrictMode, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import axios from "axios";
-import API from './api/axios'
+import API from './api/axios';
 
-// ✅ NAYA AUR SAHI IMPORT PATH (Aapke file structure ke hisaab se)
 import { Context } from "./context/Context.jsx";
 
 const AppWrapper = () => {
@@ -14,9 +13,6 @@ const AppWrapper = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState("dark");
-  
-  // Loading state taaki page refresh par UI flash na kare
-  // const [loading, setLoading] = useState(true);
 
   // Theme badalne wala function
   const toggleTheme = () => {
@@ -27,32 +23,23 @@ const AppWrapper = () => {
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
-        // Backend ke "/me" route ko call karke user ki details maango
         const { data } = await API.get("me", {
-          withCredentials: true, // Cookie ko request ke saath bhejega
+          withCredentials: true, 
         });
         
-        // Agar response successful hai, to user logged in hai
         setIsAuthenticated(true);
         setUser(data.user);
-        setLoading(false); // Check ho gaya, ab loading band karo
       } catch (error) {
-        // Agar error aaya (matlab cookie nahi hai ya invalid hai)
         setIsAuthenticated(false);
         setUser(null);
-        setLoading(false); // Check ho gaya, ab loading band karo
       }
+      // Yahan se setLoading(false) poori tarah hata diya hai!
     };
     
     fetchUserStatus();
-  }, []); // [] ka matlab ye sirf ek baar chalega jab app shuru hogi
+  }, []); 
 
-  // Jab tak loading true hai, tab tak poori App ko rok ke rakho
-  // if (loading) {
-  //   return <div>Loading...</div>; // Yahan aap ek fancy spinner bhi laga sakte hain
-  // }
-
-  // Jab loading poori ho jaaye, tab App dikhao
+  // Jab backend load ho raha hoga, tab bhi normal App dikhegi
   return (
     <Context.Provider
       value={{
