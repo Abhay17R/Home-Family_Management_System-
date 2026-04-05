@@ -57,8 +57,27 @@ const OtpVerification = () => {
 };
 
   const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && otp[index] === "" && index > 0) {
+    // 1. BACKSPACE Key 
+    if (e.key === "Backspace") {
+     
+      if (otp[index] === "" && index > 0) {
+        document.getElementById(`otp-input-${index - 1}`).focus();
+      }
+    }
+
+    // 2. DELETE Key 
+    if (e.key === "Delete") {
+      const newOtp = [...otp];
+      newOtp[index] = ""; 
+      setOtp(newOtp);
+    }
+
+    
+    if (e.key === "ArrowLeft" && index > 0) {
       document.getElementById(`otp-input-${index - 1}`).focus();
+    }
+    if (e.key === "ArrowRight" && index < otp.length - 1) {
+      document.getElementById(`otp-input-${index + 1}`).focus();
     }
   };
 
