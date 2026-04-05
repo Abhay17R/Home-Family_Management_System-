@@ -29,6 +29,32 @@ const OtpVerification = () => {
       document.getElementById(`otp-input-${index + 1}`).focus();
     }
   };
+  const handlePaste = (e) => {
+  e.preventDefault();
+
+  const pastedData = e.clipboardData.getData("text");
+  const numbersOnly = pastedData.replace(/\D/g, "");
+
+  if (!numbersOnly) return;
+
+  const digits = numbersOnly.slice(0, 5).split("");
+
+  const newOtp = [...otp];
+  digits.forEach((digit, index) => {
+    newOtp[index] = digit;
+  });
+
+  setOtp(newOtp);
+
+  const focusIndex = Math.min(digits.length, 4);
+  const inputToFocus = document.getElementById(
+    `otp-input-${focusIndex === 5 ? 4 : focusIndex}`
+  );
+
+  if (inputToFocus) {
+    inputToFocus.focus();
+  }
+};
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && otp[index] === "" && index > 0) {
@@ -100,6 +126,7 @@ const OtpVerification = () => {
                 value={digit}
                 onChange={(e) => handleChange(e.target.value, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
+                onPaste={handlePaste} 
                 required
                 inputMode="numeric"
               />
