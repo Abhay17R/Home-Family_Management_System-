@@ -1,19 +1,8 @@
-// Full, updated, and final code for Location.jsx
-
-import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { formatDistanceToNow } from 'date-fns';
 import API from '../../api/axios';
 import '../../styles/Dashboard/location.css';
-
-// ... (Leaflet Icon Fix and ChangeView component waise hi rahenge) ...
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-});
 
 const formatLastUpdated = (dateString) => {
     if (!dateString) return 'Offline';
@@ -22,30 +11,40 @@ const formatLastUpdated = (dateString) => {
     } catch (error) { return 'Invalid date'; }
 };
 
-const ChangeView = ({ center, zoom }) => {
-    const map = useMap();
-    useEffect(() => {
-        if (center) {
-            map.flyTo(center, zoom, { animate: true, duration: 1.5 });
-        }
-    }, [center, zoom, map]);
-    return null;
+// Google Map Container styling
+const containerStyle = {
+    width: '100%',
+    height: '100%',
+    minHeight: '400px' // Apne hisaab se adjust kar lena
 };
 
-// --- MAIN COMPONENT ---
 const LocationDashboard = () => {
     const [familyMembers, setFamilyMembers] = useState([]);
-    const [mapCenter, setMapCenter] = useState([22.5726, 88.3639]);
+    // Google Maps lat/lng ko object me accept karta hai array [lat, lng] me nahi
+    const [mapCenter, setMapCenter] = useState({ lat: 22.5726, lng: 88.3639 }); 
     const [currentUser, setCurrentUser] = useState(null);
     const [locationStatus, setLocationStatus] = useState({ status: 'idle', message: '' });
-    
-    // --- NAYI STATE: Selected member ki poori details store karne ke liye ---
     const [selectedMember, setSelectedMember] = useState(null); 
-    
     const [togglingMemberId, setTogglingMemberId] = useState(null);
+    const [mapInstance, setMapInstance] = useState(null);
+
     const locationIntervalRef = useRef(null);
 
-    // ... (Saare useEffects waise hi rahenge) ...
+    // --- GOOGLE MAPS API LOADER ---
+   const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, 
+});
+
+    // Map Load/Unload handlers
+    const onLoad = useCallback(function callback(map) {
+        setMapInstance(map);
+    }, []);
+
+    const onUnmount = useCallback(function callback(map) {
+        setMapInstance(null);
+    }, []);
+
     // Effect 1: Fetch Current User
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -81,7 +80,7 @@ const LocationDashboard = () => {
             setLocationStatus({ status: 'success', message: '' }); 
             try {
                 await API.post('/location/update', { lat: position.coords.latitude, lng: position.coords.longitude });
-            } catch (err) { /* ... error handling ... */ }
+            } catch (err) { console.error(err); }
         };
         const handleLocationError = (err) => {
             setLocationStatus({ status: 'error', message: `Location permission denied.` });
@@ -99,8 +98,6 @@ const LocationDashboard = () => {
         return () => { if (locationIntervalRef.current) clearInterval(locationIntervalRef.current); };
     }, []);
 
-
-    // ... (handlePrivacyToggle waisa hi rahega) ...
     const handlePrivacyToggle = async (memberId, currentStatus) => {
         setTogglingMemberId(memberId);
         const newStatus = !currentStatus;
@@ -114,11 +111,17 @@ const LocationDashboard = () => {
         }
     };
     
-    // --- UPDATE: focusOnMember ab 'selectedMember' state ko set karega ---
     const focusOnMember = (member) => {
-        setSelectedMember(member); // Poora member object state me daalo
-        if (member.isSharing && member.location?.lat) {
-            setMapCenter([member.location.lat, member.location.lng]);
+        setSelectedMember(member); 
+        if (member.isSharing && member.location?.lat && member.location?.lng) {
+            const newCenter = { lat: member.location.lat, lng: member.location.lng };
+            setMapCenter(newCenter);
+            
+            // Map ko smoothly nayi location par move karne ke liye
+            if (mapInstance) {
+                mapInstance.panTo(newCenter);
+                mapInstance.setZoom(15); // Focus karne pe thoda zoom in ho jayega
+            }
         }
     };
 
@@ -134,7 +137,6 @@ const LocationDashboard = () => {
                         {familyMembers.map((member) => (
                             <li key={member._id} className={`member-item ${selectedMember?._id === member._id ? 'selected' : ''}`}>
                                 <div className="member-info" onClick={() => focusOnMember(member)}>
-                                    {/* ... JSX for avatar and details ... */}
                                     <div className="member-avatar">{member.name.charAt(0).toUpperCase()}</div>
                                     <div className="member-details">
                                         <span className="member-name">{member.name} {member._id === currentUser?._id && '(You)'}</span>
@@ -143,7 +145,6 @@ const LocationDashboard = () => {
                                         </span>
                                     </div>
                                 </div>
-                                {/* ... JSX for privacy toggle ... */}
                                 <div className="privacy-toggle">
                                     {currentUser && member._id === currentUser._id && (
                                         <label className="switch">
@@ -156,42 +157,58 @@ const LocationDashboard = () => {
                         ))}
                     </ul>
 
-                    {/* ======================================================= */}
-                    {/* ===== JSX ME NAYA DETAILS PANEL ===== */}
-                    {/* ======================================================= */}
                     {selectedMember && (
                         <div className="member-details-panel">
                             <h3>{selectedMember.name}'s Details</h3>
                             <div className="details-grid">
                                 <p><strong>Status:</strong></p>
                                 <p>{selectedMember.isSharing ? 'Sharing Location' : 'Sharing Off'}</p>
-                                
                                 <p><strong>Latitude:</strong></p>
                                 <p>{selectedMember.isSharing && selectedMember.location?.lat ? selectedMember.location.lat.toFixed(4) : 'N/A'}</p>
-                                
                                 <p><strong>Longitude:</strong></p>
                                 <p>{selectedMember.isSharing && selectedMember.location?.lng ? selectedMember.location.lng.toFixed(4) : 'N/A'}</p>
-                                
                                 <p><strong>Last Update:</strong></p>
                                 <p>{selectedMember.isSharing && selectedMember.location?.lat ? formatLastUpdated(selectedMember.lastUpdated) : 'N/A'}</p>
                             </div>
                         </div>
                     )}
-                    {/* ======================================================= */}
-
                 </div>
+
                 <div className="map-container-wrapper">
-                    <MapContainer center={mapCenter} zoom={5} scrollWheelZoom={true} className="map-view">
-                        <ChangeView center={mapCenter} zoom={13} />
-                        <TileLayer attribution='...' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        {familyMembers
-                            .filter((member) => member.isSharing && member.location?.lat)
-                            .map((member) => (
-                                <Marker key={member._id} position={[member.location.lat, member.location.lng]}>
-                                    <Popup><b>{member.name}</b><br />Last seen: {formatLastUpdated(member.lastUpdated)}</Popup>
-                                </Marker>
-                            ))}
-                    </MapContainer>
+                    {/* Map tabhi render hoga jab script load ho jayegi */}
+                    {loadError && <div>Error loading maps</div>}
+                    {!isLoaded && !loadError && <div>Loading Maps...</div>}
+                    {isLoaded && (
+                        <GoogleMap
+                            mapContainerStyle={containerStyle}
+                            center={mapCenter}
+                            zoom={13}
+                            onLoad={onLoad}
+                            onUnmount={onUnmount}
+                            options={{ disableDefaultUI: false, zoomControl: true }} // Tum inko control kar sakte ho
+                        >
+                            {/* Active family members ke markers render karo */}
+                            {familyMembers
+                                .filter((member) => member.isSharing && member.location?.lat && member.location?.lng)
+                                .map((member) => (
+                                    <MarkerF 
+                                        key={member._id} 
+                                        position={{ lat: member.location.lat, lng: member.location.lng }}
+                                        onClick={() => setSelectedMember(member)} // Marker click pe info window khulegi
+                                    >
+                                        {/* InfoWindow (Tooltip) sirf tab dikhegi jab member selected ho */}
+                                        {selectedMember && selectedMember._id === member._id && (
+                                            <InfoWindowF onCloseClick={() => setSelectedMember(null)}>
+                                                <div style={{ color: 'black', padding: '5px' }}>
+                                                    <b style={{ display: 'block', marginBottom: '5px' }}>{member.name}</b>
+                                                    <span>Last seen: {formatLastUpdated(member.lastUpdated)}</span>
+                                                </div>
+                                            </InfoWindowF>
+                                        )}
+                                    </MarkerF>
+                                ))}
+                        </GoogleMap>
+                    )}
                 </div>
             </div>
         </div>
