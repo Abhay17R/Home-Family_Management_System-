@@ -17,9 +17,90 @@ dotenv.config({ path: 'config.env' });
 
 const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 
+// export const register = catchAsyncError(async (req, res, next) => {
+//   const { name, email, phone, password, verificationMethod, role = "child", parentId, familyId } = req.body;
+//   console.log(req.body);
+//   if (!name || !email || !phone || !password || !verificationMethod) {
+//     return next(new ErrorHandler("All fields are required.", 400));
+//   }
+
+//   // Validate phone format (E.164)
+//   function validatePhoneNumber(phone) {
+//     const phoneRegex = /^\+[1-9]\d{1,14}$/;
+//     return phoneRegex.test(phone);
+//   }
+
+//   if (!validatePhoneNumber(phone)) {
+//     return next(new ErrorHandler("Invalid phone number.", 400));
+//   }
+
+//   // For child role, familyId must be provided
+//   if (role === "child" && !familyId) {
+//     return next(new ErrorHandler("Family ID is required for child account.", 400));
+//   }
+
+//   // Check if email or phone already verified
+//   const existingVerifiedUser = await User.findOne({
+//     $or: [{ email: email.toLowerCase(), accountVerified: true }, { phone, accountVerified: true }],
+//   });
+
+//   if (existingVerifiedUser) {
+//     return next(new ErrorHandler("Phone or Email is already used.", 400));
+//   }
+
+//   // Limit unverified registration attempts in last hour
+//   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+//   const registrationAttemptsByUser = await User.find({
+//     $or: [{ phone, accountVerified: false }, { email: email.toLowerCase(), accountVerified: false }],
+//     createdAt: { $gte: oneHourAgo },
+//   });
+
+//   if (registrationAttemptsByUser.length >= 3) {
+//     return next(new ErrorHandler("You have exceeded the maximum number of attempts (3) in the last hour. Please try again later.", 400));
+//   }
+
+//   // Find if unverified user already exists with same email
+//   let user = await User.findOne({ email: email.toLowerCase() });
+
+//   if (user) {
+//     if (user.accountVerified) {
+//       return next(new ErrorHandler("Email already registered.", 400));
+//     }
+//     // Update password, role, parentId, familyId & generate new verification code for unverified user
+//     user.password = password;
+//     user.role = role;
+//     user.parentId = role === "child" ? parentId : null;
+//     user.familyId = role === "child" ? familyId : crypto.randomBytes(8).toString("hex");
+//     user.generateVerificationCode();
+//     await user.save();
+//   } else {
+//     // Create new user with role, parentId, familyId
+//     user = new User({
+//       name,
+//       email: email.toLowerCase(),
+//       phone,
+//       password,
+//       role,
+//       parentId: role === "child" ? parentId : null,
+//       familyId: role === "child" ? familyId : crypto.randomBytes(8).toString("hex"),
+//     });
+//     user.generateVerificationCode();
+//     await user.save();
+//   }
+
+//   // Send verification code by selected method
+//   await sendVerificationCode(verificationMethod, user.verificationCode, user.email, user.phone);
+
+//   res.status(200).json({
+//     success: true,
+//     message: `Verification code sent via ${verificationMethod}`,
+//   });
+// });
+
 export const register = catchAsyncError(async (req, res, next) => {
   const { name, email, phone, password, verificationMethod, role = "child", parentId, familyId } = req.body;
   console.log(req.body);
+  
   if (!name || !email || !phone || !password || !verificationMethod) {
     return next(new ErrorHandler("All fields are required.", 400));
   }
@@ -48,33 +129,38 @@ export const register = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Phone or Email is already used.", 400));
   }
 
-  // Limit unverified registration attempts in last hour
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-  const registrationAttemptsByUser = await User.find({
-    $or: [{ phone, accountVerified: false }, { email: email.toLowerCase(), accountVerified: false }],
-    createdAt: { $gte: oneHourAgo },
-  });
-
-  if (registrationAttemptsByUser.length >= 3) {
-    return next(new ErrorHandler("You have exceeded the maximum number of attempts (3) in the last hour. Please try again later.", 400));
-  }
-
-  // Find if unverified user already exists with same email
+  // Ek hi instance check karne ka naya logic
   let user = await User.findOne({ email: email.toLowerCase() });
 
   if (user) {
+    // Agar account pehle se verified hai
     if (user.accountVerified) {
       return next(new ErrorHandler("Email already registered.", 400));
     }
-    // Update password, role, parentId, familyId & generate new verification code for unverified user
+
+    // Time gap check (1 hour = 3600000 milliseconds)
+    const gap = Date.now() - user.updatedAt.getTime();
+    if (gap > 3600000) {
+      user.cnt = 0; // 1 ghante ke baad attempts reset kar do
+    }
+
+    // Agar 3 ya usse zyada try ho chuke hain
+    if (user.cnt >= 3) {
+      return next(new ErrorHandler("You have exceeded the maximum number of attempts (3) in the last hour. Please try again later.", 400));
+    }
+
+    // Update existing unverified user details aur cnt increment karein
     user.password = password;
     user.role = role;
     user.parentId = role === "child" ? parentId : null;
     user.familyId = role === "child" ? familyId : crypto.randomBytes(8).toString("hex");
+    user.cnt = (user.cnt || 0) + 1; 
+    
     user.generateVerificationCode();
     await user.save();
+    
   } else {
-    // Create new user with role, parentId, familyId
+    // Naya user banayein agar bilkul exist nahi karta
     user = new User({
       name,
       email: email.toLowerCase(),
@@ -83,6 +169,7 @@ export const register = catchAsyncError(async (req, res, next) => {
       role,
       parentId: role === "child" ? parentId : null,
       familyId: role === "child" ? familyId : crypto.randomBytes(8).toString("hex"),
+      cnt: 1, // Pehli attempt
     });
     user.generateVerificationCode();
     await user.save();

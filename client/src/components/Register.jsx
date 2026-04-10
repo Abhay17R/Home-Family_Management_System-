@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // useState add kiya
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Context } from "../context/Context.jsx"; 
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,6 @@ const countryCodes = [
 ];
 
 const Register = ({ setIsLogin }) => {
-  // isSubmitting nikala react-hook-form se
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       verificationMethod: "email",
@@ -25,13 +24,11 @@ const Register = ({ setIsLogin }) => {
   });
   const navigateTo = useNavigate();
   
-  // Wake-up check state
   const [isWakingUpServer, setIsWakingUpServer] = useState(false);
 
   const handleRegister = async (data) => {
     data.phone = `${data.countryCode}${data.phone}`;
 
-    // Timer start karo
     const timeoutId = setTimeout(() => {
         setIsWakingUpServer(true);
     }, 4000);
@@ -49,10 +46,16 @@ const Register = ({ setIsLogin }) => {
       navigateTo(`/otp-verification/${data.email}/${data.phone}`);
     } catch (error) {
       console.log(error);
-      // Optional: Error toast dikha sakte ho yahan
-      // toast.error("Registration failed. Please try again.");
+      
+      // ✅ YAHAN FIX ADD KIYA HAI ✅
+      // Backend ka message nikal kar toast.error() me daal diya
+      let msg = "Registration failed. Please try again.";
+      if (error.response && error.response.data && error.response.data.message) {
+        msg = error.response.data.message;
+      }
+      toast.error(msg); // Ab red color ka error toast aayega screen pe
+
     } finally {
-      // Clear timeout and reset state
       clearTimeout(timeoutId);
       setIsWakingUpServer(false);
     }

@@ -41,6 +41,10 @@
       locationTracking: { type: Boolean, default: true },
       emergencyAlerts: { type: Boolean, default: true },
   },
+  cnt: { 
+    type: Number, 
+    default: 0 
+  },
     phone: String,
     accountVerified: { type: Boolean, default: false },
     verificationCode: Number,
